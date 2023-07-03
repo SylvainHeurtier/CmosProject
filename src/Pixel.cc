@@ -12,8 +12,6 @@
 #include "G4ios.hh"
 
 
-
-
 Pixel::Pixel(const G4String& SDname)
  : G4VSensitiveDetector(SDname)
 {
@@ -22,6 +20,10 @@ Pixel::Pixel(const G4String& SDname)
 	G4String hcName = SensitiveDetectorName + "HitsCollection";
 	collectionName.insert("HitCollection"); //"HitCollection" = our hits collection name
 }
+
+Pixel::~Pixel()
+{}
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
