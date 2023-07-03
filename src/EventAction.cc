@@ -42,10 +42,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
   //fRunAction->AddEdep(fEdep);
 
   // get analysis manager
-  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  //G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
   // Fill histograms
   //analysisManager->FillH1(0, fEdep);
+  
   //G4int nofHits = fHitsCollection->entries();
   //for ( G4int i=0; i<nofHits; i++ ) {
   //  analysisManager->FillH1(0, (*fHitsCollection)[i]);

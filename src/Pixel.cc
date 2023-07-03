@@ -12,6 +12,9 @@
 #include "G4ios.hh"
 #include "PixelHit.hh"
 
+#include "G4CsvAnalysisManager.hh"
+#include "G4AnalysisManager.hh"
+
 
 namespace B1
 {
@@ -52,23 +55,23 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 
 
 	//
-	//G4StepPoint* preStepPoint = step->GetPreStepPoint();
-	//G4TouchableHistory* theTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
-	//G4int copyNo = theTouchable->GetVolume()->GetCopyNo();
+	G4StepPoint* preStepPoint = step->GetPreStepPoint();
+	G4TouchableHistory* theTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
+	G4int copyNo = theTouchable->GetVolume()->GetCopyNo();
 	//G4int motherCopyNo = theTouchable->GetVolume(1)->GetCopyNo();
 	//G4int grandMotherCopyNo = theTouchable->GetVolume(2)->GetCopyNo();
 	//G4ThreeVector worldPos = preStepPoint->GetPosition();
 	//G4ThreeVector localPos = theTouchable->GetHistory()
 	//				->GetTopTransform().TransformPoint(worldPos);
-	//newHit->SetCopyNo(copyNo);
+	newHit->SetCopyNo(copyNo);
 
 	// Add hit in the collection
-  	//fHitsCollection->insert(newHit);
+  	fHitsCollection->insert(newHit);
 
 	//Position
 	//G4ThreeVector position = step->GetPreStepPoint()->GetPosition();
 
-	return true;
+	return false;
 
 }
 
@@ -79,9 +82,14 @@ void Pixel::EndOfEvent(G4HCofThisEvent* /*hce*/)
   G4cout << "\n-------->" <<  fHitsCollection->GetName()
          << ": in this event: " << G4endl;
 
+
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+
   G4int nofHits = fHitsCollection->entries();
   for ( G4int i=0; i<nofHits; i++ ) {
-    (*fHitsCollection)[i]->Print();
+  	PixelHit* hit = static_cast<PixelHit*>(fHitsCollection->GetHit(i));
+    analysisManager->FillH1(0, hit->GetEdep());
+    //analysisManager->FillH1(0, hit->GetEdep());
   }
 }
 }

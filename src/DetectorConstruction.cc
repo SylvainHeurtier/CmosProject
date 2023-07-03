@@ -103,6 +103,12 @@ namespace B1
     logicshape_Si = new G4LogicalVolume(shapePix,  //its solid
                               shape,             //its material
                               Material);         //its name
+    G4String nameLV;
+    G4String namePVP;
+    char bufferLV[100];
+    char bufferPVP[100];
+    int countLV;
+    int countPVP;
 
     int compteur=0;
     for(nx=0;nx<=50;nx=nx+1){ // 0<=nx<=255
@@ -112,18 +118,22 @@ namespace B1
         //std::cout << "===========================================================" << std::endl;
 
         //Construction de la partie haut droite du chip
-        char buffer[100];
-        int count =sprintf(buffer, "PixelSD%d",compteur);
+        countLV =sprintf(bufferLV, "PixelLV%d",compteur);
+        countPVP =sprintf(bufferPVP, "PixelPVP%d",compteur);
 
-        G4String name;
-        if(Test=1){
-          name=buffer;}
+        if(Test==1){
+          nameLV=bufferLV;
+          namePVP=bufferPVP;}
         else{
-          name="Name";}
+          nameLV="NameLV";
+          namePVP="NamePVP";}
+        logicshape_Si = new G4LogicalVolume(shapePix,  //its solid
+                              shape,             //its material
+                              nameLV);         //its name
         new G4PVPlacement(pRot,              //rotation
                     G4ThreeVector((0.5+nx)*Xpix,(0.5+ny)*Ypix, pos_z),//coordinates
                     logicshape_Si,           //its logical volume
-                    name,                    //its name
+                    namePVP,                    //its name
                     logicEnv,                //its mother  volume
                     false,                   //no boolean operation
                     compteur,                //copy number
@@ -131,48 +141,66 @@ namespace B1
         compteur+=1;
 
         
-        count =sprintf(buffer, "PixelSD%d",compteur);
+        countLV =sprintf(bufferLV, "PixelLV%d",compteur);
+        countPVP =sprintf(bufferPVP, "PixelPVP%d",compteur);
         //Construction de la partie haut gauche du chip
-        if(Test=1){
-          name=buffer;}
+        if(Test==1){
+          nameLV=bufferLV;
+          namePVP=bufferPVP;}
         else{
-          name="Name";}
+          nameLV="NameLV";
+          namePVP="NamePVP";}
+        logicshape_Si = new G4LogicalVolume(shapePix,  //its solid
+                              shape,             //its material
+                              nameLV);         //its name
         new G4PVPlacement(pRot,              //rotation
                     G4ThreeVector((-0.5-nx)*Xpix,(0.5+ny)*Ypix, pos_z),//coordinates
                     logicshape_Si,           //its logical volume
-                    name,                    //its name
+                    namePVP,                    //its name
                     logicEnv,                //its mother  volume
                     false,                   //no boolean operation
                     compteur,                //copy number
                     checkOverlaps);          //overlaps checking
         compteur+=1;
 
-        count =sprintf(buffer, "PixelSD%d",compteur);
+        countLV =sprintf(bufferLV, "PixelLV%d",compteur);
+        countPVP =sprintf(bufferPVP, "PixelPVP%d",compteur);
         //Construction de la partie basse droite du chip
-        if(Test=1){
-          name=buffer;}
+        if(Test==1){
+          nameLV=bufferLV;
+          namePVP=bufferPVP;}
         else{
-          name="Name";}
+          nameLV="NameLV";
+          namePVP="NamePVP";}
+        logicshape_Si = new G4LogicalVolume(shapePix,  //its solid
+                              shape,             //its material
+                              nameLV);         //its name
         new G4PVPlacement(pRot,             //rotation
                     G4ThreeVector((0.5+nx)*Xpix,(-0.5-ny)*Ypix, pos_z),//coordinates
                     logicshape_Si,          //its logical volume
-                    name,                   //its name
+                    namePVP,                   //its name
                     logicEnv,               //its mother  volume
                     false,                  //no boolean operation
                     compteur,               //copy number
                     checkOverlaps);         //overlaps checking
         compteur+=1;
 
-        count =sprintf(buffer, "PixelSD%d",compteur);
+        countLV =sprintf(bufferLV, "PixelLV%d",compteur);
+        countPVP =sprintf(bufferPVP, "PixelPVP%d",compteur);
         //Construction de la partie basse gauche du chip
-        if(Test=1){
-          name=buffer;}
+        if(Test==1){
+          nameLV=bufferLV;
+          namePVP=bufferPVP;}
         else{
-          name="Name";}
+          nameLV="NameLV";
+          namePVP="NamePVP";}
+        logicshape_Si = new G4LogicalVolume(shapePix,  //its solid
+                              shape,             //its material
+                              nameLV);         //its name
         new G4PVPlacement(pRot,             //rotation
                     G4ThreeVector((-0.5-nx)*Xpix,(-0.5-ny)*Ypix, pos_z),//coordinates
                     logicshape_Si,          //its logical volume
-                    name,                   //its name
+                    namePVP,                   //its name
                     logicEnv,               //its mother  volume
                     false,                  //no boolean operation
                     compteur,               //copy number
@@ -342,16 +370,19 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   int count, count1;
   char buffer[100];
   char buffer1[100];
+  G4String pixelname;
+  G4String mySensitive;
   int j;
-  for(j=0;j<=524287;j=j+1){ //1024*512 = 524288 pixels au total 
+
+  for(j=0;j<=10403;j=j+1){ //1024*512 = 524288 pixels au total 
     //mais le compteur commence à 0 dans la fonction ConstructChip => 0<=j<=524287
-    count =sprintf(buffer, "PixelSD%d",j);
+    count =sprintf(buffer, "PixelLV%d",j);
     count1 =sprintf(buffer1, "mySensitive%d",j);
-    G4String pixelname = buffer;
-    G4String mySensitive = buffer1;
-    Pixel* pixel = new Pixel("test");
-    G4SDManager::GetSDMpointer()->AddNewDetector(pixel);
-    SetSensitiveDetector(mySensitive, pixel);
+    pixelname = buffer;
+    mySensitive = buffer1;
+    Pixel* PixelSensitive = new Pixel(mySensitive);
+    G4SDManager::GetSDMpointer()->AddNewDetector(PixelSensitive);
+    SetSensitiveDetector(pixelname, PixelSensitive);
   }
   // Set ShapeDUT as scoring volume
   //fScoringVolume = logicshape_Si;
