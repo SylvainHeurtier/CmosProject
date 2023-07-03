@@ -10,8 +10,11 @@
 #include "G4VTouchable.hh"
 #include "G4Step.hh"
 #include "G4ios.hh"
+#include "PixelHit.hh"
 
 
+namespace B1
+{
 Pixel::Pixel(const G4String& SDname)
  : G4VSensitiveDetector(SDname)
 {
@@ -41,12 +44,11 @@ void Pixel::Initialize(G4HCofThisEvent* /*hce*/)
 //G4Step can be interrogated to get information about physics process and volumes
 G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 {
-	//Hit* newHit = new Hit();
+	PixelHit* newHit = new PixelHit();
 
 	// Get some properties from G4Step and set them to the hit
-	// newHit->SetXYZ();
-	//G4double edep = step->GetTotalEnergyDeposit();
-	//newHit->AddEdep(edep);
+	G4double edep = step->GetTotalEnergyDeposit();
+	newHit->AddEdep(edep);
 
 
 	//
@@ -81,6 +83,7 @@ void Pixel::EndOfEvent(G4HCofThisEvent* /*hce*/)
   for ( G4int i=0; i<nofHits; i++ ) {
     (*fHitsCollection)[i]->Print();
   }
+}
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

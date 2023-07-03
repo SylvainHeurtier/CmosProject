@@ -2,21 +2,25 @@
 
 //Hits must be stored in a collection of hits instantiated from
 //G4THitsCollection template class
-#ifndef Hit_h
-#define Hit_h 1
+#ifndef PixelHit_h
+#define PixelHit_h 1
 
 #include "G4VHit.hh"
 #include "G4Allocator.hh"
 #include "G4THitsCollection.hh"
 
-class Hit : public G4VHit 
+namespace B1
+{
+
+class PixelHit : public G4VHit 
 {
 	public:
-		Hit(); //create a new Hit: the ID is the layer index
-		~Hit() override;
-		const Hit& operator=(const Hit& right);
+		PixelHit(); //create a new Hit: the ID is the layer index
+		~PixelHit() override;
+		PixelHit(const PixelHit& right);
+		const PixelHit& operator=(const PixelHit& right);
 
-		int operator==(const Hit &right) const;
+		int operator==(const PixelHit &right) const;
 
     	inline void* operator new(size_t);
     	inline void  operator delete(void* hit);
@@ -39,21 +43,23 @@ private:
 };
 
 // Define the "hit collection" using the template class G4THitsCollection:
-typedef G4THitsCollection<Hit> HitCollection;
+typedef G4THitsCollection<PixelHit> HitCollection;
 
 
-extern G4Allocator<Hit>* HitAllocator;
+extern G4Allocator<PixelHit>* PixelHitAllocator;
 
-inline void* Hit::operator new(size_t)
+inline void* PixelHit::operator new(size_t)
 {
-  if (! HitAllocator)
-        HitAllocator = new G4Allocator<Hit>;
-  return (void*)HitAllocator->MallocSingle();
+  if (! PixelHitAllocator)
+        PixelHitAllocator = new G4Allocator<PixelHit>;
+  return (void*)PixelHitAllocator->MallocSingle();
 }
 
-inline void Hit::operator delete(void* hit)
+inline void PixelHit::operator delete(void* hit)
 {
-  HitAllocator->FreeSingle((Hit*) hit);
+  PixelHitAllocator->FreeSingle((PixelHit*) hit);
+}
+
 }
 
 #endif

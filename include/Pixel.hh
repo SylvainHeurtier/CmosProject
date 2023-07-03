@@ -3,7 +3,7 @@
 
 
 #include "G4VSensitiveDetector.hh"
-#include "Hit.hh"
+#include "PixelHit.hh"
 
 //Creation of a sensitive detector (SD)
 
@@ -14,6 +14,8 @@ class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
+namespace B1
+{
 class Pixel : public G4VSensitiveDetector
 {
 public:
@@ -33,5 +35,6 @@ private:
 	//PixelHitsCollection* fHitsCollection = nullptr;
 
 };
+}
 
 #endif
