@@ -1,0 +1,36 @@
+# Macro file for example B1
+#
+# Can be run in batch, without graphic
+# or interactively: Idle> /control/execute run1.mac
+#
+# Change the default number of workers (in multi-threading mode)
+#/run/numberOfThreads 4
+#
+# Initialize kernel
+/run/initialize
+#
+/control/verbose 2
+/run/verbose 2
+/event/verbose 0
+/tracking/verbose 1
+#
+# pion 6 GeV to the direction (0.,0.,1.)
+#
+/gun/particle pi+
+#/gun/energy 6 GeV
+#
+# Primaries
+/gps/ene/type Gauss
+/gps/ene/mono 6 GeV # changing this value in a parametric run
+/gps/ene/sigma 0.15 GeV # changing this value in a parametric run
+/gps/direction 0 0 -1
+/gps/pos/centre 0 0 1 mm
+/gps/pos/type Beam
+#
+# Add scoring ID QUANTITY PARTICLE
+#/SEE/scoring/addScoring 2 Ekin pi+
+# Set histogram for last scoring SCALE LOWLIM UPLIM BINS
+#/SEE/scoring/setHistogram log 10 eV 6 GeV 200
+#
+/run/beamOn 100
+#
