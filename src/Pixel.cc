@@ -37,6 +37,7 @@ void Pixel::Initialize(G4HCofThisEvent* /*hce*/)
   G4String hcName = SensitiveDetectorName + "HitsCollection";
 
   fHitsCollection = new HitCollection(SensitiveDetectorName, hcName);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -45,9 +46,11 @@ void Pixel::Initialize(G4HCofThisEvent* /*hce*/)
 //G4Step can be interrogated to get information about physics process and volumes
 G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 {
+	std::cout <<  "la !" << std::endl;
+
 	// Change the following lines to get the charge of the tracked particle
-	G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
-  	if ( charge == 0. ) return false;
+	// G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
+  	// if ( charge == 0. ) return false;
 
 	PixelHit* newHit = new PixelHit();
 
@@ -59,9 +62,9 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 	std::cout <<  "----------"<< edep <<"--------------" << std::endl;
 	std::cout <<  "------------------------------------" << std::endl;
 	//
-	//G4StepPoint* preStepPoint = step->GetPreStepPoint();
-	//G4TouchableHistory* theTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
-	//G4int copyNo = theTouchable->GetVolume()->GetCopyNo();
+	G4StepPoint* preStepPoint = step->GetPreStepPoint();
+	G4TouchableHistory* theTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
+	G4int copyNo = theTouchable->GetVolume()->GetCopyNo();
 	//G4int motherCopyNo = theTouchable->GetVolume(1)->GetCopyNo();
 	//G4int grandMotherCopyNo = theTouchable->GetVolume(2)->GetCopyNo();
 	//G4ThreeVector worldPos = preStepPoint->GetPosition();
@@ -70,8 +73,8 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 	//newHit->SetCopyNo(copyNo);
 
 	// Position
-  	//G4ThreeVector position = preStepPoint->GetPosition();
-  	//newHit->SetPosition(position);
+  	G4ThreeVector position = preStepPoint->GetPosition();
+  	// newHit->SetPosition(position);
 
 	// Add hit in the collection
   	fHitsCollection->insert(newHit);
@@ -93,12 +96,15 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
    	std::cout<<"------------ "<<p<<" ------------"<<std::endl;
   	std::cout<<"---------------------------------"<<std::endl;
 
-  	//analysisManager->FillNtupleIColumn(fNtupleId, 0, p );
-  	//analysisManager->FillNtupleDColumn(fNtupleId, 1, newHit->GetEdep());
-  	//analysisManager->AddNtupleRow(fNtupleId);
-
+	  // Add hits properties in the ntuple
+  	analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo);
+  	analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
+  	analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
+  	analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
+  	analysisManager->FillNtupleDColumn(fNtupleId, 4, edep);
+  	analysisManager->AddNtupleRow(fNtupleId);
 	
-	return false;
+	return true;
 
 }
 
