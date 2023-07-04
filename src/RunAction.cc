@@ -4,13 +4,10 @@
 /// \file B1/src/RunAction.cc
 /// \brief Implementation of the B1::RunAction class
 
-
 #include "RunAction.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "DetectorConstruction.hh"
-// #include "Run.hh"
 
-//#include "MyAnalysis.hh"
 #include "G4CsvAnalysisManager.hh"
 
 #include "G4RunManager.hh"
@@ -28,23 +25,28 @@ namespace B1
 
   RunAction::RunAction()
   {
-  // add new units for dose
+  // Create analysis manager
+  auto analysisManager = G4AnalysisManager::Instance();
+  analysisManager->SetVerboseLevel(1);
+  //analysisManager->SetNtupleMerging(true);
+
+  // Creating histograms
+
+  // histogram 1
+  analysisManager->CreateH1("Edep", "Energy deposit", 100, 0., 10*GeV);
+
+  // Creating ntuples
   //
-  const G4double milligray = 1.e-3*gray;
-  const G4double microgray = 1.e-6*gray;
-  const G4double nanogray  = 1.e-9*gray;
-  const G4double picogray  = 1.e-12*gray;
+  // ntuple id = 0
+  //analysisManager->CreateNtuple("HitPixel", "Pixel 1 hits");
+  //analysisManager->CreateNtupleIColumn("Pixel");   // column id = 0
+  //analysisManager->CreateNtupleDColumn("Edep");    // column id = 1
+  //analysisManager->FinishNtuple();
 
-  new G4UnitDefinition("milligray", "milliGy" , "Dose", milligray);
-  new G4UnitDefinition("microgray", "microGy" , "Dose", microgray);
-  new G4UnitDefinition("nanogray" , "nanoGy"  , "Dose", nanogray);
-  new G4UnitDefinition("picogray" , "picoGy"  , "Dose", picogray);
-
-  // Register accumulable to the accumulable manager
-  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
-  accumulableManager->RegisterAccumulable(fEdep);
-  accumulableManager->RegisterAccumulable(fEdep2);
   }
+
+  //RunAction::~RunAction()
+  //{}
 
   ////////////////////////////////////////////////////////////////////////////////
   //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -52,9 +54,6 @@ namespace B1
 
   void RunAction::BeginOfRunAction(const G4Run*)
   {
-  // Book histograms, ntuple
-  //
-  
   // Create analysis manager
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetVerboseLevel(1);
@@ -62,20 +61,16 @@ namespace B1
   // Create directories 
   //analysisManager->SetHistoDirectoryName("histograms");
   //analysisManager->SetNtupleDirectoryName("ntuple");
-  
+
   // Open an output file
-  G4String fileName = "output.csv";
+  G4String fileName = "Output.csv";
   analysisManager->OpenFile(fileName);
 
   // Creating histograms
-  analysisManager->CreateH1("Edep","Energy deposit", 10, 0., 10*GeV);
-
+  //analysisManager->CreateH1("Edep","Energy deposit", 10, 0., 10*GeV);
   // inform the runManager to save random number seed
-  G4RunManager::GetRunManager()->SetRandomNumberStore(false);
+  //G4RunManager::GetRunManager()->SetRandomNumberStore(false);
 
-  // reset accumulables to their initial values
-  G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
-  accumulableManager->Reset();
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -91,14 +86,11 @@ namespace B1
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
   if ( analysisManager->GetH1(0) ) {
-    G4cout << "\n ----> print histograms statistic \n"<< G4endl
-    << "------------------------------------------------------------"<< G4endl
-    << G4endl;
+    G4cout <<"-------------> print histograms statistic \n"<< G4endl << "------------------------------------------------------------"<< G4endl << G4endl;
     
-    G4cout 
-       << " Edep : mean = " << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy") 
-               << " rms = " << G4BestUnit(analysisManager->GetH1(0)->rms(),  "Energy") 
-               << G4endl;
+    G4cout << " Edep : mean = " << G4BestUnit(analysisManager->GetH1(0)->mean(), "Energy") 
+               << " rms = " << G4BestUnit(analysisManager->GetH1(0)->rms(),  "Energy") << G4endl;
+    G4cout <<"\n"<< G4endl << "------------------------------------------------------------"<< G4endl<< G4endl;
   }
   // save histograms 
   //
@@ -109,19 +101,7 @@ namespace B1
   delete G4AnalysisManager::Instance(); 
 
   }
-  ////////////////////////////////////////////////////////////////////////////////
-  //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-  ////////////////////////////////////////////////////////////////////////////////
 
-  void RunAction::AddEdep(G4double edep)
-  {
-  fEdep  += edep;
-  fEdep2 += edep*edep;
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////
-  //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-  ////////////////////////////////////////////////////////////////////////////////
 }
 
 

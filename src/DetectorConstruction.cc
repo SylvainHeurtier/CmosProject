@@ -237,7 +237,7 @@ namespace B1
                                 "shapePh");    //its name
 
     // Option to switch on/off checking of volumes overlaps
-    G4bool checkOverlaps = true;
+    G4bool checkOverlaps = false;
 
     new G4PVPlacement(0,                          //no rotation
                     G4ThreeVector(0,0,pos_z),     //at (0,0,pos_z)
@@ -380,7 +380,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     count1 =sprintf(buffer1, "mySensitive%d",j);
     pixelname = buffer;
     mySensitive = buffer1;
-    Pixel* PixelSensitive = new Pixel(mySensitive);
+    Pixel* PixelSensitive = new Pixel(mySensitive, j);
     G4SDManager::GetSDMpointer()->AddNewDetector(PixelSensitive);
     SetSensitiveDetector(pixelname, PixelSensitive);
   }

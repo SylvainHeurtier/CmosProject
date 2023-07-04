@@ -20,7 +20,7 @@ class Pixel : public G4VSensitiveDetector
 {
 public:
 	//Constructor
-	Pixel(const G4String& SDname);
+	Pixel(const G4String& SDname,G4int ntupleID);
 	//Destructor
 	~Pixel() override;
 
@@ -33,7 +33,7 @@ public:
 private:
 	HitCollection* fHitsCollection = nullptr;
 	//PixelHitsCollection* fHitsCollection = nullptr;
-
+	G4int fNtupleId = 0;
 };
 }
 
