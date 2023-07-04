@@ -25,71 +25,81 @@
 //
 // $Id$
 //
-/// \file RunAction.cc
-/// \brief Implementation of the RunAction class
+/// \file ChipHit.cc
+/// \brief Implementation of the ChipHit class
+//
 
-#include "RunAction.hh"
+#include "ChipHit.hh"
 
-#include "G4AnalysisManager.hh"
-#include "G4Run.hh"
+#include "G4VVisManager.hh"
+#include "G4Circle.hh"
+#include "G4Colour.hh"
+#include "G4VisAttributes.hh"
 #include "G4SystemOfUnits.hh"
-
 
 namespace ED
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction()
-{
-
-  // Create analysis manager
-  auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->SetVerboseLevel(1);
-  analysisManager->SetNtupleMerging(true);
-
-  // Creating ntuples for the sensitive chip
-  // ntuple id = 0
-  analysisManager->CreateNtuple("Chip0", "Chip 0 hits");
-  analysisManager->CreateNtupleIColumn("Layer");   // column id = 0
-  analysisManager->CreateNtupleDColumn("Xpos");    // column id = 1
-  analysisManager->CreateNtupleDColumn("Ypos");    // column id = 2
-  analysisManager->CreateNtupleDColumn("Zpos");    // column id = 3
-  analysisManager->CreateNtupleDColumn("eDep");    // column id = 3
-  analysisManager->FinishNtuple();
-
-}
+G4Allocator<ChipHit>* ChipHitAllocator = nullptr;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::~RunAction()
+ChipHit::ChipHit()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void RunAction::BeginOfRunAction(const G4Run* /*run*/)
-{
-  // Get analysis manager
-  auto analysisManager = G4AnalysisManager::Instance();
+ChipHit::~ChipHit()
+{}
 
-  // Open an output file
-  G4String fileName = "ED.root";
-  analysisManager->OpenFile(fileName);
-  G4cout << "Using " << analysisManager->GetType() << G4endl;
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+ChipHit::ChipHit(const ChipHit& /*right*/)
+ : G4VHit()
+{}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+const ChipHit& ChipHit::operator=(const ChipHit& /*right*/)
+{
+  return *this;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void RunAction::EndOfRunAction(const G4Run* /*run*/)
+int ChipHit::operator==(const ChipHit& right) const
 {
-  // save histograms
-  //
-  auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->Write();
-  analysisManager->CloseFile();
+  return ( this == &right ) ? 1 : 0;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ChipHit::Print()
+{
+  G4cout << "Chamber hit in layer: " << fLayerNumber
+         << "   time [s]: " << fTime/s
+         << "   position [mm]: " <<  fPosition/mm << G4endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ChipHit::Draw()
+{
+  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+  if(pVVisManager)
+  {
+    G4Circle circle(fPosition);
+    circle.SetScreenSize(4.);
+    circle.SetFillStyle(G4Circle::filled);
+    G4Colour colour(1.,0.,0.);
+    G4VisAttributes attribs(colour);
+    circle.SetVisAttributes(attribs);
+    pVVisManager->Draw(circle);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 }
-

@@ -25,39 +25,70 @@
 //
 // $Id$
 //
-/// \file EventAction.hh
-/// \brief Definition of the EventAction class
+/// \file ChipHit.hh
+/// \brief Definition of the ChipHit class
+//
 
-#ifndef EventAction_h
-#define EventAction_h 1
+#ifndef ChipHit_h
+#define ChipHit_h 1
 
-#include "G4UserEventAction.hh"
-#include "globals.hh"
-
-class G4GenericMessenger;
-
-/// Event action class
+#include "G4VHit.hh"
+#include "G4THitsCollection.hh"
+#include "G4Allocator.hh"
+#include "G4ThreeVector.hh"
 
 namespace ED
 {
 
-class EventAction : public G4UserEventAction
+class ChipHit : public G4VHit
 {
   public:
-    EventAction();
-    ~EventAction() override;
+    ChipHit();
+    ~ChipHit() override;
+    ChipHit(const ChipHit& right);
+    const ChipHit& operator=(const ChipHit& right);
+    int operator==(const ChipHit &right) const;
 
-    void  BeginOfEventAction(const G4Event* event) override;
-    void    EndOfEventAction(const G4Event* event) override;
+    inline void* operator new(size_t);
+    inline void  operator delete(void* hit);
+
+    void Print() override;
+    void Draw() override;
+
+    // setter methods
+    void SetLayerNumber(G4int number) { fLayerNumber = number; }
+    void SetTime(G4double time)       { fTime = time; }
+    void SetPosition(G4ThreeVector position) { fPosition = position; }
+
+    // getter methods
+    G4int          GetLayerNumber() const { return fLayerNumber;}
+    G4double       GetTime() const        { return fTime; }
+    G4ThreeVector  GetPosition() const    { return fPosition; }
 
   private:
-    G4GenericMessenger*  fMessenger = nullptr;
-    G4bool fVerbose = true;
+    // data members
+    G4int          fLayerNumber = -1;
+    G4double       fTime = 0.;
+    G4ThreeVector  fPosition;
 };
 
+typedef G4THitsCollection<ChipHit> ChipHitsCollection;
+
+extern G4Allocator<ChipHit>* ChipHitAllocator;
+
+inline void* ChipHit::operator new(size_t)
+{
+  if (! ChipHitAllocator)
+        ChipHitAllocator = new G4Allocator<ChipHit>;
+  return (void*)ChipHitAllocator->MallocSingle();
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+inline void ChipHit::operator delete(void* hit)
+{
+  ChipHitAllocator->FreeSingle((ChipHit*) hit);
+}
+
+}
 
 #endif
 

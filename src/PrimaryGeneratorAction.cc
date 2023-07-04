@@ -39,7 +39,7 @@
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
 
-namespace B1
+namespace ED
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -101,8 +101,8 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   G4double x = 1300*um;
   G4double y = 1300*um;
-  G4double x0 = x *G4UniformRand()-x *G4UniformRand();
-  G4double y0 = y *G4UniformRand()-y *G4UniformRand();
+  G4double x0 = 0.;// x *G4UniformRand()-x *G4UniformRand();
+  G4double y0 = 0.; // *G4UniformRand()-y *G4UniformRand();
   G4double z0 = -0.5 * envSizeZ;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
