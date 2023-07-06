@@ -50,14 +50,22 @@ RunAction::RunAction()
 
   // Creating ntuples for the sensitive chip
   // ntuple id = 0
+  
   analysisManager->CreateNtuple("Chip0", "Chip 0 hits");
   analysisManager->CreateNtupleIColumn("Layer");   // column id = 0
-  analysisManager->CreateNtupleDColumn("Xpos");    // column id = 1
-  analysisManager->CreateNtupleDColumn("Ypos");    // column id = 2
-  analysisManager->CreateNtupleDColumn("Zpos");    // column id = 3
-  analysisManager->CreateNtupleDColumn("eDep");    // column id = 3
+  analysisManager->CreateNtupleDColumn("Xposition");    // column id = 1
+  analysisManager->CreateNtupleDColumn("Yposition");    // column id = 2
+  analysisManager->CreateNtupleDColumn("Zposition");    // column id = 3
+  analysisManager->CreateNtupleDColumn("Edep");    // column id = 3
   analysisManager->FinishNtuple();
 
+  /*
+  analysisManager->CreateH1("X","Xpos",300,-10*mm,10*mm);    // column id = 1
+  analysisManager->CreateH1("Y","Ypos",300,-10*mm,10*mm);    // column id = 2
+  analysisManager->CreateH1("Z","Zpos",300,-10*mm,10*mm);    // column id = 3
+  analysisManager->CreateH1("E","eDep",300,0.,6*GeV);    // column id = 3
+  analysisManager->CreateH2("Position","Position hits",300,-10*mm,10*mm,300,-10*mm,10*mm);    // column id = 3
+  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -73,7 +81,7 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
   auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
-  G4String fileName = "ED.root";
+  G4String fileName = "ED_epaisseur25um.root";
   analysisManager->OpenFile(fileName);
   G4cout << "Using " << analysisManager->GetType() << G4endl;
 }

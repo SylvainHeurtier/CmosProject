@@ -104,12 +104,22 @@ G4bool ChipSD::ProcessHits(G4Step* step,
   G4double edep = step->GetTotalEnergyDeposit();
 
   auto analysisManager = G4AnalysisManager::Instance();
+  
   analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo);
   analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
   analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
   analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
   analysisManager->FillNtupleDColumn(fNtupleId, 4, edep);
   analysisManager->AddNtupleRow(fNtupleId);
+  
+  /*
+  analysisManager->FillH1( 0, position.x());
+  analysisManager->FillH1( 1, position.y());
+  analysisManager->FillH1( 2, position.z());
+  analysisManager->FillH1( 3, edep);
+  analysisManager->FillH2( 0, position.x(), position.y());
+  */
+
 
   return false;
 }
