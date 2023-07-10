@@ -19,7 +19,7 @@
 /gun/particle pi+
 /gun/energy 6 GeV
 #
-/run/beamOn 5
+/run/beamOn 200000
 # 
 # proton 210 MeV to the direction (0.,0.,1.)
 #

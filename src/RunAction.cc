@@ -29,7 +29,7 @@
 /// \brief Implementation of the RunAction class
 
 #include "RunAction.hh"
-
+#include "Constants.hh"
 #include "G4AnalysisManager.hh"
 #include "G4Run.hh"
 #include "G4SystemOfUnits.hh"
@@ -81,7 +81,6 @@ void RunAction::BeginOfRunAction(const G4Run* /*run*/)
   auto analysisManager = G4AnalysisManager::Instance();
 
   // Open an output file
-  G4String fileName = "ED_epaisseur25um.root";
   analysisManager->OpenFile(fileName);
   G4cout << "Using " << analysisManager->GetType() << G4endl;
 }

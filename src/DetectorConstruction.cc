@@ -55,10 +55,6 @@ namespace ED
   G4NistManager* nist = G4NistManager::Instance();
 
 //-------------------------------------------//
-//             Parametres
-  G4double epaisseur = 25*um; //25*um
-  double angle = 30.; //inclinaison chip
-//-------------------------------------------//
 
 
   void ConstructChip (
@@ -71,7 +67,6 @@ namespace ED
                       G4LogicalVolume* logicEnv,
                       bool sensitive)
   {
-
     //Just build the chip
 
     // Creation of the chip
@@ -79,8 +74,8 @@ namespace ED
     G4Material* shape = nist->FindOrBuildMaterial(Material);
 
     // Hole for the chip
-    G4VSolid* shapeIN      = new G4Box("shapeIN",6.912*mm,14.848*mm,epaisseur);  // half the size of the chips
-    G4VSolid* shapeOUT     = new G4Box("shapeOUT",30*mm,30*mm,epaisseur);     // half the size of plastic plans
+    G4VSolid* shapeIN      = new G4Box("shapeIN",6.912*mm,14.848*mm,shape_dz);  // half the size of the chips
+    G4VSolid* shapeOUT     = new G4Box("shapeOUT",30*mm,30*mm,shape_dz);     // half the size of plastic plans
     G4VSolid* shapePh      = new G4SubtractionSolid("shapePhantom", shapeOUT, shapeIN,0, G4ThreeVector(0,0,pos_z));
     G4LogicalVolume* logicshapePh = new G4LogicalVolume(shapePh, shape_plastic,"shapePh");
     new G4PVPlacement(pRot,                          //no rotation
@@ -103,7 +98,7 @@ namespace ED
     sprintf(chip_name_lv, "%sLV",chipName);
     sprintf(chip_name_pv, "%sPV",chipName);
 
-    G4VSolid* shapeChip            = new G4Box("shapeChip", 6.912*mm,14.848*mm,epaisseur);
+    G4VSolid* shapeChip            = new G4Box("shapeChip", 6.912*mm,14.848*mm,shape_dz);
     G4LogicalVolume* logicshape_Si = new G4LogicalVolume(
                                 shapeChip,        //its solid
                                 shape,            //its material
@@ -277,7 +272,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // the sensitive chip
   char chip_name_sv[100];
   sprintf(chip_name_sv, "Chip%d",0);
-  ConstructChip(chip_name_sv, 0, shape_dz_IB, 0, "G4_Si", rotationMatrix, logicEnv, true); //Test=1
+  ConstructChip(chip_name_sv, 0, epaisseur, 0, "G4_Si", rotationMatrix, logicEnv, true); //Test=1
 
   //
   //always return the physical World
