@@ -22,15 +22,15 @@ const G4double Xpix=27*um;
 const G4double Ypix=29*um;
 const G4double epaisseur = 25*um; //25*um
 
-// row and column for a chip
-const int npxl_row = 1;
-const int npxl_col = 1;
+// half number of (number of row -1) and (number of column -1) for a chip 
+const int npxl_row = 100;
+const int npxl_col = 100;
 
 // Angle of the chip with the vertical axis
 const double angle = 0.;
 
 // Name of the ROOT file
-const G4String fileName = "ED_test.root";
+const G4String fileName = "ED_pixel2.root";
 }
 
 #endif

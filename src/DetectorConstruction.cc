@@ -1,42 +1,22 @@
 //
 // ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
+// *                      Detector Construction                       *
 // ********************************************************************
-//
+// 
 // $Id$
 //
 /// \file DetectorConstruction.cc
 /// \brief Implementation of the DetectorConstruction class
 
 #include "DetectorConstruction.hh"
-#include "ChipSD.hh"
+//#include "ChipSD.hh"
+#include "Pixel.hh"
 #include "Constants.hh"
 
 #include "G4NistManager.hh"
 #include "G4SDManager.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
-#include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
@@ -65,7 +45,7 @@ namespace ED
                       const G4String & Material, // material of the layer
                       G4RotationMatrix* pRot,    // angle of the plan
                       G4LogicalVolume* logicEnv,
-                      bool sensitive)
+                      bool full) // if full==True we build the chip with pixels
   {
     //Just build the chip
 
@@ -113,11 +93,55 @@ namespace ED
             station,                      //copy number
             checkOverlaps);               //overlaps checking
 
-    if (sensitive){
-      auto chipSD = new ChipSD(chip_name_sv, station);
-      G4SDManager::GetSDMpointer()->AddNewDetector(chipSD);
-      logicshape_Si->SetSensitiveDetector(chipSD);
+//**************Construction of pixels if full==True**********************
+
+    if (full){
+      // if full==True we build the chip with pixels
+
+      char pxl_name_lv[100];
+      char pxl_name_pvp[100];
+      int countLV;
+      int countPVP;
+
+      //Create a solid and declaration
+      G4VSolid* shapePix= new G4Box("shapePix", 0.5*Xpix, 0.5*Ypix, shape_dz);
+      G4LogicalVolume* logicshape_Pix;
+
+      //CopyNumber of pixel =compteur - initialisation
+      int compteur=0;
+
+      //Double loop to build pixel one by one in the chip
+      for( int nx = -npxl_row; nx <= npxl_row; nx++){
+        for( int ny = -npxl_col; ny <= npxl_col; ny++){
+
+          //Create name of pixel
+          countLV = sprintf(pxl_name_lv, "PixelLV%d",compteur);
+          countPVP = sprintf(pxl_name_pvp, "PixelPVP%d",compteur);
+
+          //Create a logical volume
+          logicshape_Pix = new G4LogicalVolume(shapePix,  //its solid
+                                  shape,                  //its material
+                                  pxl_name_lv);           //its name
+
+          new G4PVPlacement(pRot,              //rotation
+                    G4ThreeVector((0.5+nx)*Xpix,(0.5+ny)*Ypix, pos_z),//coordinates
+                    logicshape_Pix,           //its logical volume
+                    pxl_name_pvp,            //its name
+                    logicshape_Si,           //its mother volume = logical volume of the chip
+                    false,                   //no boolean operation
+                    compteur,                //copy number
+                    checkOverlaps);          //overlaps checking
+
+          compteur+=1;
+
+          //Pixel = a sensite detector
+          Pixel* pixelSD = new Pixel(pxl_name_lv, 0);//Pixel(pxl_name_lv, compteur)
+          G4SDManager::GetSDMpointer()->AddNewDetector(pixelSD);
+          logicshape_Pix->SetSensitiveDetector(pixelSD);
+        }
+      }
     }
+//***********************************************************************
 
   }
 

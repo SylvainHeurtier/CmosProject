@@ -25,51 +25,62 @@
 //
 // $Id$
 //
-/// \file EventAction.cc
-/// \brief Implementation of the EventAction class
+/// \file PixelHit.cc
+/// \brief Implementation of the PixelHit class
+//
 
-#include "EventAction.hh"
+#include "PixelHit.hh"
 
-#include "G4Event.hh"
-#include "G4GenericMessenger.hh"
-#include "G4ios.hh"
+#include "G4VVisManager.hh"
+#include "G4Circle.hh"
+#include "G4Colour.hh"
+#include "G4VisAttributes.hh"
+#include "G4SystemOfUnits.hh"
 
 namespace ED
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::EventAction()
-  {
-  // Generic messenger
-  // Define /ED/event commands using generic messenger class
-  fMessenger
-    = new G4GenericMessenger(this, "/ED/event/", "Primary generator control");
-
-  // Define /ED/event/setVerbose command
-  fMessenger->DeclareProperty("setVerbose",
-                      fVerbose,
-                      "Activate/Inactivate verbose option");
-  }
+G4Allocator<PixelHit>* PixelHitAllocator = nullptr;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-EventAction::~EventAction()
-  {}
+PixelHit::PixelHit()
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::BeginOfEventAction(const G4Event* event){
-  if ( fVerbose )
-    G4cout << ">>> Start event: " << event->GetEventID() << G4endl;
-  }
+PixelHit::~PixelHit()
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::EndOfEventAction(const G4Event* event){
-  if ( fVerbose )
-    G4cout << ">>> End event: " << event->GetEventID() << G4endl;
-  }
+PixelHit::PixelHit(const PixelHit& /*right*/)
+ : G4VHit()
+{}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+const PixelHit& PixelHit::operator=(const PixelHit& /*right*/)
+{
+  return *this;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+int PixelHit::operator==(const PixelHit& right) const
+{
+  return ( this == &right ) ? 1 : 0;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PixelHit::Print()
+{
+  //G4cout << "To be implemented" << G4endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 }

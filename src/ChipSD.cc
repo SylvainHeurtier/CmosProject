@@ -61,8 +61,7 @@ void ChipSD::Initialize(G4HCofThisEvent* hce)
 {
   G4String hcName = SensitiveDetectorName + "HitsCollection";
 
-  fHitsCollection
-    = new ChipHitsCollection(SensitiveDetectorName, hcName);
+  fHitsCollection = new ChipHitsCollection(SensitiveDetectorName, hcName);
 
   G4int hcID
     = G4SDManager::GetSDMpointer()->GetCollectionID(hcName);
@@ -103,13 +102,54 @@ G4bool ChipSD::ProcessHits(G4Step* step,
   // energy deposit
   G4double edep = step->GetTotalEnergyDeposit();
 
+  // Name particle
+  G4String NameParticle = step->GetTrack()->GetDefinition()->GetParticleName();
+  std::cout << "Name Particle :" << NameParticle << std::endl;
+  G4int NumParticle;
+  if (NameParticle=="pi+")
+    NumParticle=6;
+  else if (NameParticle=="pi-")
+    NumParticle=-6;
+  else if (NameParticle=="e+")
+    NumParticle=2;
+  else if (NameParticle=="e-")
+    NumParticle=-2;
+  else if (NameParticle=="mu+")
+    NumParticle=3;
+  else if (NameParticle=="mu-")
+    NumParticle=-3;
+  else if (NameParticle=="kaon+")
+    NumParticle=4;
+  else if (NameParticle=="kaon-")
+    NumParticle=-4;
+  else if (NameParticle=="proton")
+    NumParticle=1;
+  else if (NameParticle=="anti_proton")
+    NumParticle=-1;
+  else
+    NumParticle=0;
+
+  //The GPD code
+  G4int Nbcode = step->GetTrack()->GetDynamicParticle()->GetPDGcode();
+  std::cout << "The PDG code :" << Nbcode << std::endl;
+
+  //Charge
+  G4double ChargeParticle = step->GetTrack()->GetDynamicParticle()->GetCharge();
+
+  //
+  //G4int copyNo_pixel = step->GetTrack()->GetVolume()->GetLogicalVolume()->GetDaughter()->GetCopyNo();
+  G4int copyNo_pixel = step->GetTrack()->GetVolume()->GetCopyNo();
+
   auto analysisManager = G4AnalysisManager::Instance();
-  
-  analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo);
+  analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo_pixel);
   analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
   analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
   analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
   analysisManager->FillNtupleDColumn(fNtupleId, 4, edep);
+  //analysisManager->FillNtupleSColumn(fNtupleId, 5, NameParticle);
+  //analysisManager->FillNtupleIColumn(fNtupleId, 5, NumParticle);
+  //analysisManager->FillNtupleIColumn(fNtupleId, 5, Nbcode);
+  //analysisManager->FillNtupleDColumn(fNtupleId, 6, ChargeParticle);
   analysisManager->AddNtupleRow(fNtupleId);
   
   /*

@@ -38,6 +38,7 @@
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
+#include "G4SystemOfUnits.hh"
 
 namespace ED
 {
