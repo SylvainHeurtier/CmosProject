@@ -69,8 +69,6 @@ namespace ED
     G4VisAttributes* shapePhVisAtt = new G4VisAttributes(G4Colour(1.0,0.0,0.0));
     logicshapePh->SetVisAttributes(shapePhVisAtt);
       
-
-
     char chip_name_sv[100];
     char chip_name_lv[100];
     char chip_name_pv[100];
@@ -132,12 +130,12 @@ namespace ED
                     compteur,                //copy number
                     checkOverlaps);          //overlaps checking
 
-          compteur+=1;
-
           //Pixel = a sensite detector
           Pixel* pixelSD = new Pixel(pxl_name_lv, 0);//Pixel(pxl_name_lv, compteur)
           G4SDManager::GetSDMpointer()->AddNewDetector(pixelSD);
           logicshape_Pix->SetSensitiveDetector(pixelSD);
+
+          compteur+=1;
         }
       }
     }
@@ -260,16 +258,16 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   G4double* Z; // list of positions along the z-axis of the layers
   int n = 10; 
   Z=(G4double*)malloc(n*sizeof(G4double));
-  Z[0]=-103.2*mm; // chip 
-  Z[1]=-83.6*mm;  // chip
-  Z[2]=-64*mm;    // chip 
-  Z[3]=69*mm;     // chip
-  Z[4]=88.6*mm;   // chip
-  Z[5]=108.2*mm;  // chip
-  Z[6]=-50*mm;    // plan of aluminium
-  Z[7]=-4*std::cos(angle*deg)*mm;     // plan of aluminium
-  Z[8]=8*std::cos(angle*deg)*mm;      // plan of aluminium
-  Z[9]=57*mm;     // plan of aluminium
+  Z[0] =-103.2*mm; // chip 
+  Z[1] =-83.6*mm;  // chip
+  Z[2] =-64*mm;    // chip 
+  Z[3] =69*mm;     // chip
+  Z[4] =88.6*mm;   // chip
+  Z[5] =108.2*mm;  // chip
+  Z[6] =-50*mm;    // plan of aluminium
+  Z[7] =-4*std::cos(angle*deg)*mm;     // plan of aluminium
+  Z[8] =8*std::cos(angle*deg)*mm;      // plan of aluminium
+  Z[9] =57*mm;     // plan of aluminium
 
   G4RotationMatrix* rotationMatrix = new G4RotationMatrix();
   rotationMatrix->rotateX(angle*deg);

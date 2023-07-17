@@ -26,13 +26,12 @@ public:
 
 public:
 	void   Initialize(G4HCofThisEvent* hce) override;
-	G4bool ProcessHits(G4Step *step, G4TouchableHistory *ROhist) override; 
 	//called for each GStep in sensitive volume
+	G4bool ProcessHits(G4Step *step, G4TouchableHistory *ROhist) override; 
 	void   EndOfEvent(G4HCofThisEvent* hce) override;
 
 private:
 	HitCollection* fHitsCollection = nullptr;
-	//PixelHitsCollection* fHitsCollection = nullptr;
 	G4int fNtupleId = 0;
 };
 }

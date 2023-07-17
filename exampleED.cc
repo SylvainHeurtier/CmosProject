@@ -31,9 +31,11 @@
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 
-#include "G4RunManager.hh"
+#include "G4RunManagerFactory.hh"
+// #include "G4GDMLParser.hh"
 #include "G4UImanager.hh"
 #include "G4PhysListFactory.hh"
+#include "G4GenericBiasingPhysics.hh"
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
@@ -43,7 +45,8 @@
 namespace {
   void PrintUsage() {
     G4cerr << " Usage: " << G4endl;
-    G4cerr << " exampleB4a [-m macro ] [-p physList ] [-u UIsession]" << G4endl;
+    G4cerr << " exampleB4a [-m macro ] [-p physList ] [-u UIsession] [-g GDMLfile] " << G4endl
+           << "            [-b on/off (biasing on or offf)]" << G4endl;
     G4cerr << G4endl;
   }
 }
@@ -54,7 +57,7 @@ int main(int argc,char** argv)
 {
   // Evaluate arguments
   //
-  if ( argc > 7 ) {
+  if ( argc > 9 ) {
     PrintUsage();
     return 1;
   }
@@ -62,10 +65,14 @@ int main(int argc,char** argv)
   G4String macro;
   G4String session;
   G4String physicsListName;
+  G4String gdmlFileName;
+  G4String biasing = "on";
   for ( G4int i=1; i<argc; i=i+2 ) {
     if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
     else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
     else if ( G4String(argv[i]) == "-p" ) physicsListName = argv[i+1];
+    else if ( G4String(argv[i]) == "-g" ) gdmlFileName = argv[i+1];
+    else if ( G4String(argv[i]) == "-b" ) biasing = argv[i+1];
     else {
       PrintUsage();
       return 1;
@@ -79,9 +86,11 @@ int main(int argc,char** argv)
     ui = new G4UIExecutive(argc, argv, session);
   }
 
-  // Construct the run manager
+  // Construct the default run manager
   //
-  G4RunManager* runManager = new G4RunManager;
+  auto* runManager =
+    G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  runManager->SetNumberOfThreads(2);
 
   // Set mandatory initialization classes
   //
@@ -96,19 +105,37 @@ int main(int argc,char** argv)
            << " is not defined." << G4endl;
     return 1;
   }
+
   G4VModularPhysicsList* physicsList
     = physListFactory.GetReferencePhysList(physicsListName);
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
+  // modify the modular physics list to activate biasing:
+  if ( biasing == "on" ) {
+    G4GenericBiasingPhysics* biasingPhysics = new G4GenericBiasingPhysics();
+    biasingPhysics->Bias("neutron");
+    physicsList->RegisterPhysics(biasingPhysics);
+  }
+
   // User action initialization
   runManager->SetUserInitialization(new ED::ActionInitialization());
+
+  // // Export in GDML
+  // if ( gdmlFileName.size() ) {
+  //   // Implement code to export geometry in GDML
+  //   G4GDMLParser parser;
+  //   G4LogicalVolume* worldLV
+  //     = G4TransportationManager::GetTransportationManager()
+  //       ->GetNavigatorForTracking()->GetWorldVolume()->GetLogicalVolume();
+  //   parser.Write(gdmlFileName, worldLV);
+  // }
 
   // Initialize visualization
   //
   G4VisManager* visManager = new G4VisExecutive;
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  //G4VisManager* visManager = new G4VisExecutive("Quiet");
+  // G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
   // Get the pointer to the User Interface manager

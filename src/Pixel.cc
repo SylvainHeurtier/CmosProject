@@ -51,37 +51,34 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 	G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
   	if ( charge == 0. ) return false;
 
-	PixelHit* newHit = new PixelHit();
-/*
-	// Get some properties from G4Step and set them to the hit
-	G4double edep = step->GetTotalEnergyDeposit();
-	newHit->AddEdep(edep);
-*/
-  // Time
-  G4StepPoint* preStepPoint = step->GetPreStepPoint();
-  G4double time = preStepPoint->GetGlobalTime();
-  newHit->SetTime(time);
 
+
+	// Get some properties from G4Step and set them to the hit
+  G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  // Time
+  G4double time = preStepPoint->GetGlobalTime();
   // Position
   G4ThreeVector position = preStepPoint->GetPosition();
-  newHit->SetPosition(position);
-/*
+  // energy deposit
+  G4double edep = step->GetTotalEnergyDeposit();
+  // The GPD code
+  G4int Nbcode = step->GetTrack()->GetDynamicParticle()->GetPDGcode();
   // Layer number
-  // = copy number of mother volume
   const G4VTouchable* touchable = preStepPoint->GetTouchable();
   G4int copyNo = touchable->GetCopyNumber(1);
+
+  // Pixel hit collection used for printout
+  PixelHit* newHit = new PixelHit();
+  newHit->SetTime(time);
+  fHitsCollection->insert(newHit);
+  newHit->SetPosition(position);
   newHit->SetLayerNumber(copyNo);
-*/
   // Add hit in the collection
   fHitsCollection->insert(newHit);
 
-  // energy deposit
-  G4double edep = step->GetTotalEnergyDeposit();
 
   // Name particle
   G4String NameParticle = step->GetTrack()->GetDefinition()->GetParticleName();
-  //std::cout<<"---------------------------------"<<std::endl; 
-  //std::cout << "Name Particle: " << NameParticle << std::endl;
   G4int NumParticle;
   if (NameParticle=="pi+")
     NumParticle=6;
@@ -105,21 +102,6 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
     NumParticle=-1;
   else
     NumParticle=0;
-
-  //The GPD code
-  //G4int Nbcode = step->GetTrack()->GetDynamicParticle()->GetPDGcode();
-  //std::cout << "The PDG code: " << Nbcode << std::endl;
-
-  //Charge
-  //G4double ChargeParticle = step->GetTrack()->GetDynamicParticle()->GetCharge();
-
-  //
-  //G4int copyNo_pixel = step->GetTrack()->GetVolume()->GetCopyNo();
-
-
-
-	// Add hit in the collection
-  	fHitsCollection->insert(newHit);
 
   	// Add hits properties in the ntuple
   	G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
@@ -150,8 +132,7 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
   	analysisManager->FillNtupleDColumn(fNtupleId, 2, time);
   	analysisManager->FillNtupleDColumn(fNtupleId, 3, edep);
     analysisManager->FillNtupleIColumn(fNtupleId, 4, NumParticle);
-    //analysisManager->FillNtupleIColumn(fNtupleId, 5, Nbcode);
-    //analysisManager->FillNtupleDColumn(fNtupleId, 6, ChargeParticle);
+    analysisManager->FillNtupleIColumn(fNtupleId, 5, Nbcode);
   	analysisManager->AddNtupleRow(fNtupleId);
 	
 	return true;
