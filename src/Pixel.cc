@@ -13,6 +13,10 @@
 #include "G4Step.hh"
 #include "G4ios.hh"
 
+#include<iostream>
+#include<string>
+using namespace std;
+
 namespace ED
 {
 Pixel::Pixel(const G4String& SDname, G4int ntupleID)
@@ -112,19 +116,31 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
   			       //on commence à i=7 car les 6 premiers termes = PixelLV
   	int Npix = 0; // initialisation du numéro du pixel
   	while (i<n){
-  		Npix = Npix + name[i]*pow(10,i-7);
+      string a;
+      a=name[i];
+      int num = stoi(a);
+      //std::cout<<"---- name[i] = "<< num <<" ----"<<std::endl;
+      //std::cout<<"---- name[i]*pow(10,n-i-1) = "<< num*pow(10,n-i-1) <<" ----"<<std::endl;
+  		Npix = Npix + num*pow(10,n-i-1);
   		i=i+1;
   	}
+    //std::cout<<"---- name = "<< name <<" ----"<<std::endl;
 
     //Division euclidienne pour récupérer les coordonnées du pixel:
     //Npix = (npxl_col*2+1)*C + L avec C le numéro de colonne et L de la ligne
     int L = Npix % (npxl_col*2+1);
-    int C = Npix / (npxl_col*2+1);
+    int C = (Npix-L) / (npxl_col*2+1);
 
+    //std::cout<<"---- Npix = "<< Npix <<" ----"<<std::endl;
+    //std::cout<<"---- L = "<< L <<" ----"<<std::endl;
+    //std::cout<<"---- C = "<< C <<" ----"<<std::endl;
 
   	// Npix = numéro du pixel
    	//std::cout<<"----"<< "Numéro du pixel: "<<Npix<<" ----"<<std::endl;
   	//std::cout<<"---------------------------------"<<std::endl;
+
+    // Add hits properties in the ntuple
+    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
 	  // Add hits properties in the ntuple
   	analysisManager->FillNtupleIColumn(fNtupleId, 0, L);

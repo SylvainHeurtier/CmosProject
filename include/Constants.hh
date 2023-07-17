@@ -30,7 +30,7 @@ const int npxl_col = 100;
 const double angle = 0.;
 
 // Name of the ROOT file
-const G4String fileName = "ED_pixel2.root";
+const G4String fileName = "ED_pixel3.root";
 }
 
 #endif
