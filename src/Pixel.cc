@@ -139,9 +139,6 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
    	//std::cout<<"----"<< "Numéro du pixel: "<<Npix<<" ----"<<std::endl;
   	//std::cout<<"---------------------------------"<<std::endl;
 
-    // Add hits properties in the ntuple
-    G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-
 	  // Add hits properties in the ntuple
   	analysisManager->FillNtupleIColumn(fNtupleId, 0, L);
     analysisManager->FillNtupleIColumn(fNtupleId, 1, C);
