@@ -104,7 +104,7 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //G4double y = 1300*um;
   G4double R = 2*mm;
   G4double theta = 2*M_PI*G4UniformRand();
-  G4double R0 = 2*G4UniformRand()*mm;
+  G4double R0 = 500*G4UniformRand()*um; //R0 = 2*G4UniformRand()*mm
 
   G4double x0 = R0 * std::cos(theta);
   G4double y0 = R0 * std::sin(theta);

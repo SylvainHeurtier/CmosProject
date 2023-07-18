@@ -48,6 +48,14 @@ ActionInitialization::~ActionInitialization()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+/*
+void ActionInitialization::BuildForMaster() const
+{
+  SetUserAction(new RunAction);
+}
+*/
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
 void ActionInitialization::Build() const
 {
   SetUserAction(new PrimaryGeneratorAction);

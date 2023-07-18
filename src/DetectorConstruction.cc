@@ -45,7 +45,7 @@ namespace ED
                       const G4String & Material, // material of the layer
                       G4RotationMatrix* pRot,    // angle of the plan
                       G4LogicalVolume* logicEnv,
-                      bool full) // if full==True we build the chip with pixels
+                      bool full)      // if full==True we build the chip with pixels
   {
     //Just build the chip
 
@@ -108,9 +108,35 @@ namespace ED
       //CopyNumber of pixel =compteur - initialisation
       int compteur=0;
 
+      //Limits of parameters for nx and ny depend of npxl_row and npxl_col
+      int nx_max;
+      int ny_max;
+      int nx_min;
+      int ny_min;
+      
+      //Limit for nx
+      if(npxl_col%2==0){ //even number of columns
+        nx_max = npxl_col/2 -1;
+        nx_min = npxl_col/2;
+      }
+      else{
+        nx_max = (npxl_col-1)/2;
+        nx_min = nx_max;
+      }
+
+      //Limit for ny
+      if(npxl_row%2==0){ //even number of rows
+        ny_max = npxl_row/2 -1;
+        ny_min = npxl_row/2;
+      }
+      else{
+        ny_max = (npxl_row-1)/2;
+        ny_min = ny_max;
+      }
+
       //Double loop to build pixel one by one in the chip
-      for( int nx = -npxl_row; nx <= npxl_row; nx++){
-        for( int ny = -npxl_col; ny <= npxl_col; ny++){
+      for( int nx = -nx_min; nx <= nx_max; nx++){
+        for( int ny = -ny_min; ny <= ny_max; ny++){
 
           //Create name of pixel
           countLV = sprintf(pxl_name_lv, "PixelLV%d",compteur);
@@ -129,16 +155,17 @@ namespace ED
                     false,                   //no boolean operation
                     compteur,                //copy number
                     checkOverlaps);          //overlaps checking
-
-          //Pixel = a sensite detector
+          
+          //Pixel = a sensitive detector
           Pixel* pixelSD = new Pixel(pxl_name_lv, 0);//Pixel(pxl_name_lv, compteur)
           G4SDManager::GetSDMpointer()->AddNewDetector(pixelSD);
           logicshape_Pix->SetSensitiveDetector(pixelSD);
-
+          
           compteur+=1;
         }
       }
     }
+    
 //***********************************************************************
 
   }
@@ -280,7 +307,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
     // chips in the planes
     char chip_name_sv[100];
     sprintf(chip_name_sv, "Chip%d",i+1);
-    if(i<6) ConstructChip(chip_name_sv,i+1,shape_dz_IB, Z[i], "G4_Si", nullptr, logicEnv, false); //Test=0
+    if(i<6) ConstructChip(chip_name_sv,i+1,shape_dz_IB, Z[i], "G4_Si", nullptr, logicEnv, false); 
     i=i+1;
     }
   
@@ -294,7 +321,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // the sensitive chip
   char chip_name_sv[100];
   sprintf(chip_name_sv, "Chip%d",0);
-  ConstructChip(chip_name_sv, 0, epaisseur, 0, "G4_Si", rotationMatrix, logicEnv, true); //Test=1
+  ConstructChip(chip_name_sv, 0, epaisseur, 0, "G4_Si", rotationMatrix, logicEnv, true);
 
   //
   //always return the physical World

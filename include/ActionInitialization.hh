@@ -45,6 +45,8 @@ class ActionInitialization : public G4VUserActionInitialization
     ~ActionInitialization() override;
 
     void Build() const override;
+
+    //void BuildForMaster() const override;
 };
 
 }

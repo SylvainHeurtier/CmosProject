@@ -56,12 +56,12 @@ RunAction::RunAction()
   analysisManager->CreateNtupleIColumn("Colonne");       // column id  = 1
   analysisManager->CreateNtupleDColumn("time");    // column id        = 2
   analysisManager->CreateNtupleDColumn("Edep");    // column id        = 3
-  analysisManager->CreateNtupleIColumn("NumParticle");    // column id = 4
-  analysisManager->CreateNtupleIColumn("PDGcode"); // column id        = 5
+  //analysisManager->CreateNtupleIColumn("NumParticle");    // column id = 4
+  //analysisManager->CreateNtupleIColumn("PDGcode"); // column id        = 5
   //analysisManager->CreateNtupleDColumn("charge");         // column id = 6
   analysisManager->FinishNtuple();
 }
-
+ 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RunAction::~RunAction()

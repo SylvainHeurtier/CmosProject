@@ -61,14 +61,14 @@ EventAction::~EventAction()
 
 void EventAction::BeginOfEventAction(const G4Event* event){
   if ( fVerbose )
-    G4cout << ">>> Start event: " << event->GetEventID() << G4endl;
+    G4cout << "---> Start event: " << event->GetEventID() << G4endl;
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void EventAction::EndOfEventAction(const G4Event* event){
   if ( fVerbose )
-    G4cout << ">>> End event: " << event->GetEventID() << G4endl;
+    G4cout << "---> End event: " << event->GetEventID() << G4endl;
   }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

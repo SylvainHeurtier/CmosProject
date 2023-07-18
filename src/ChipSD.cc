@@ -61,11 +61,11 @@ void ChipSD::Initialize(G4HCofThisEvent* hce)
 {
   G4String hcName = SensitiveDetectorName + "HitsCollection";
 
-  fHitsCollection = new ChipHitsCollection(SensitiveDetectorName, hcName);
+  //fHitsCollection = new ChipHitsCollection(SensitiveDetectorName, hcName);
 
   G4int hcID
     = G4SDManager::GetSDMpointer()->GetCollectionID(hcName);
-  hce->AddHitsCollection( hcID, fHitsCollection );
+  //hce->AddHitsCollection( hcID, fHitsCollection );
 
 }
 
@@ -141,11 +141,12 @@ G4bool ChipSD::ProcessHits(G4Step* step,
   G4int copyNo_pixel = step->GetTrack()->GetVolume()->GetCopyNo();
 
   auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo_pixel);
-  analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
-  analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
-  analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
-  analysisManager->FillNtupleDColumn(fNtupleId, 4, edep);
+  //analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo_pixel);
+  //analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
+  //analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
+  //analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
+  analysisManager->FillNtupleDColumn(fNtupleId, 0, time);
+  analysisManager->FillNtupleDColumn(fNtupleId, 1, edep);
   //analysisManager->FillNtupleSColumn(fNtupleId, 5, NameParticle);
   //analysisManager->FillNtupleIColumn(fNtupleId, 5, NumParticle);
   //analysisManager->FillNtupleIColumn(fNtupleId, 5, Nbcode);
@@ -168,6 +169,7 @@ G4bool ChipSD::ProcessHits(G4Step* step,
 
 void ChipSD::EndOfEvent(G4HCofThisEvent* /*hce*/)
 {
+  /*
   G4cout << "\n-------->" <<  fHitsCollection->GetName()
          << ": in this event: " << G4endl;
 
@@ -175,6 +177,7 @@ void ChipSD::EndOfEvent(G4HCofThisEvent* /*hce*/)
   for ( G4int i=0; i<nofHits; i++ ) {
     (*fHitsCollection)[i]->Print();
   }
+  */
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
