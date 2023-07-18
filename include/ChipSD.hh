@@ -25,62 +25,41 @@
 //
 // $Id$
 //
-/// \file PixelHit.cc
-/// \brief Implementation of the PixelHit class
+/// \file ChipSD.hh
+/// \brief Definition of the ChipSD class
 //
 
-#include "PixelHit.hh"
+#ifndef ChipSD_h
+#define ChipSD_h 1
 
-#include "G4VVisManager.hh"
-#include "G4Circle.hh"
-#include "G4Colour.hh"
-#include "G4VisAttributes.hh"
-#include "G4SystemOfUnits.hh"
+#include "G4VSensitiveDetector.hh"
+#include "ChipHit.hh"
+
+class G4Step;
+class G4HCofThisEvent;
+class G4TouchableHistory;
 
 namespace ED
 {
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4Allocator<PixelHit>* PixelHitAllocator = nullptr;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::PixelHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::~PixelHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::PixelHit(const PixelHit& /*right*/)
- : G4VHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-const PixelHit& PixelHit::operator=(const PixelHit& /*right*/)
+class ChipSD : public G4VSensitiveDetector
 {
-  return *this;
-}
+  public:
+    ChipSD(const G4String& name,
+          G4int ntupleID);
+    ~ChipSD() override;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+    void   Initialize(G4HCofThisEvent* hce) override;
+    G4bool ProcessHits(G4Step* step, G4TouchableHistory* history) override;
+    void   EndOfEvent(G4HCofThisEvent* hce) override;
 
-int PixelHit::operator==(const PixelHit& right) const
-{
-  return ( this == &right ) ? 1 : 0;
-}
+  private:
+    ChipHitsCollection* fHitsCollection = nullptr;
+    G4int fNtupleId = 0;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void PixelHit::Print()
-{
-  //G4cout << "To be implemented" << G4endl;
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+};
 
 }
+
+#endif
+

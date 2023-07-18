@@ -1,129 +1,147 @@
 //*******************************************//
 //                  Pixel.cc                 //
 //*******************************************//
-
+ 
 #include "Pixel.hh"
-#include "PixelHit.hh"
+#include "Constants.hh"
 
+
+#include "G4AnalysisManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4SDManager.hh"
 #include "G4VTouchable.hh"
 #include "G4Step.hh"
 #include "G4ios.hh"
+#include "G4EventManager.hh"
 
-#include "G4CsvAnalysisManager.hh"
-#include "G4AnalysisManager.hh"
+#include<iostream>
+#include<string>
+using namespace std;
 
-namespace B1
+namespace ED
 {
 Pixel::Pixel(const G4String& SDname, G4int ntupleID)
- : G4VSensitiveDetector(SDname),
-   fNtupleId(ntupleID)
-{
+ : G4VSensitiveDetector(SDname),fNtupleId(ntupleID){
 	//'collectionName is a protected dat member of base class G4SensitiveDetector'
 	//Here we declare the name of the collection we will be using.
 	G4String hcName = SensitiveDetectorName + "HitsCollection";
-	collectionName.insert("HitCollection"); //"HitCollection" = our hits collection name
-}
+	collectionName.insert(hcName); //"HitCollection" = our hits collection name
+  }
 
-Pixel::~Pixel()
-{}
-
+Pixel::~Pixel(){}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void Pixel::Initialize(G4HCofThisEvent* /*hce*/)
-{
+void Pixel::Initialize(G4HCofThisEvent* hce)
+  {
   G4String hcName = SensitiveDetectorName + "HitsCollection";
 
-  fHitsCollection = new HitCollection(SensitiveDetectorName, hcName);
 
-}
+  G4int hcID
+    = G4SDManager::GetSDMpointer()->GetCollectionID(hcName);
+  }
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 
 //G4Step can be interrogated to get information about physics process and volumes
 G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
-{
-	std::cout <<  "la !" << std::endl;
+  {
 
 	// Change the following lines to get the charge of the tracked particle
-	// G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
-  	// if ( charge == 0. ) return false;
-
-	PixelHit* newHit = new PixelHit();
+	G4double charge = step->GetTrack()->GetDefinition()->GetPDGCharge();
+  	if ( charge == 0. ) return false;
 
 	// Get some properties from G4Step and set them to the hit
-	G4double edep = step->GetTotalEnergyDeposit();
-	newHit->AddEdep(edep);
+  G4StepPoint* preStepPoint = step->GetPreStepPoint();
+  // Time
+  G4double time = preStepPoint->GetGlobalTime();
+  // Position
+  G4ThreeVector position = preStepPoint->GetPosition();
+  // energy deposit
+  G4double edep = step->GetTotalEnergyDeposit();
+  // The GPD code
+  G4int Nbcode = step->GetTrack()->GetDynamicParticle()->GetPDGcode();
+  // Layer number
+  const G4VTouchable* touchable = preStepPoint->GetTouchable();
+  G4int copyNo = touchable->GetCopyNumber(1);
 
-	std::cout <<  "------------------------------------" << std::endl;
-	std::cout <<  "----------"<< edep <<"--------------" << std::endl;
-	std::cout <<  "------------------------------------" << std::endl;
-	//
-	G4StepPoint* preStepPoint = step->GetPreStepPoint();
-	G4TouchableHistory* theTouchable = (G4TouchableHistory*)(preStepPoint->GetTouchable());
-	G4int copyNo = theTouchable->GetVolume()->GetCopyNo();
-	//G4int motherCopyNo = theTouchable->GetVolume(1)->GetCopyNo();
-	//G4int grandMotherCopyNo = theTouchable->GetVolume(2)->GetCopyNo();
-	//G4ThreeVector worldPos = preStepPoint->GetPosition();
-	//G4ThreeVector localPos = theTouchable->GetHistory()
-	//				->GetTopTransform().TransformPoint(worldPos);
-	//newHit->SetCopyNo(copyNo);
+  // Pixel hit collection used for printout
+  PixelHit* newHit = new PixelHit();
+  newHit->SetTime(time);
 
-	// Position
-  	G4ThreeVector position = preStepPoint->GetPosition();
-  	// newHit->SetPosition(position);
+  newHit->SetPosition(position);
+  newHit->SetLayerNumber(copyNo);
+  // Add hit in the collection
 
-	// Add hit in the collection
-  	fHitsCollection->insert(newHit);
+  // Name particle
+  G4String NameParticle = step->GetTrack()->GetDefinition()->GetParticleName();
+  G4int NumParticle;
+  if (NameParticle=="pi+")
+    NumParticle=5;
+  else if (NameParticle=="pi-")
+    NumParticle=-5;
+  else if (NameParticle=="e+")
+    NumParticle=2;
+  else if (NameParticle=="e-")
+    NumParticle=-2;
+  else if (NameParticle=="mu+")
+    NumParticle=3;
+  else if (NameParticle=="mu-")
+    NumParticle=-3;
+  else if (NameParticle=="kaon+")
+    NumParticle=4;
+  else if (NameParticle=="kaon-")
+    NumParticle=-4;
+  else if (NameParticle=="proton")
+    NumParticle=1;
+  else if (NameParticle=="anti_proton")
+    NumParticle=-1;
+  else
+    NumParticle=0;
 
-  	// Add hits properties in the ntuple
-  	G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
+  //Get current event
+  G4int EventID = G4EventManager::GetEventManager()->GetCurrentEvent()->GetEventID();
+  	
+  // Add hits properties in the ntuple
+  G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
-  	G4String name = this->GetName(); // name = PixelLV%d with 0<=d<=10403
-  	int n = name.size();
-  	int i = 7; // variables de la boucle while: 
-  			   //on commence à i=7 car les 6 premiers termes = PixelLV
-  	int p = 0; // initialisation du numéro du pixel
-  	while (i<n){
-  		p = p + name[i]*pow(10,i-7);
-  		i=i+1;
-  	}
-  	// p = numéro du pixel
-  	std::cout<<"---------------------------------"<<std::endl;
-   	std::cout<<"------------ "<<p<<" ------------"<<std::endl;
-  	std::cout<<"---------------------------------"<<std::endl;
+  G4String name = this->GetName(); // name = PixelLV%d with 0<=d<=(npxl_col*2+1)*(npxl_row*2+1)
+  int n = name.size();
+  int i = 7; // variables de la boucle while: 
+  			       //on commence à i=7 car les 6 premiers termes = PixelLV
+  int Npix = 0; // initialisation du numéro du pixel
+  while (i<n){
+    string a;
+    a=name[i];
+    int num = stoi(a);
+    Npix = Npix + num*pow(10,n-i-1);
+  	i=i+1;
+  }
 
-	  // Add hits properties in the ntuple
-  	analysisManager->FillNtupleIColumn(fNtupleId, 0, copyNo);
-  	analysisManager->FillNtupleDColumn(fNtupleId, 1, position.x());
-  	analysisManager->FillNtupleDColumn(fNtupleId, 2, position.y());
-  	analysisManager->FillNtupleDColumn(fNtupleId, 3, position.z());
-  	analysisManager->FillNtupleDColumn(fNtupleId, 4, edep);
-  	analysisManager->AddNtupleRow(fNtupleId);
+  //Division euclidienne pour récupérer les coordonnées du pixel:
+  //Npix = (npxl_col*2+1)*C + L avec C le numéro de colonne et L de la ligne
+  int L = Npix % (npxl_col*2+1);
+  int C = (Npix-L) / (npxl_col*2+1);
+
+	// Add hits properties in the ntuple
+  analysisManager->FillNtupleIColumn(fNtupleId, 0, L);
+  analysisManager->FillNtupleIColumn(fNtupleId, 1, C);
+  analysisManager->FillNtupleDColumn(fNtupleId, 2, time);
+  analysisManager->FillNtupleDColumn(fNtupleId, 3, edep);
+  //analysisManager->FillNtupleIColumn(fNtupleId, 4, NumParticle);
+  analysisManager->AddNtupleRow(fNtupleId);
 	
 	return true;
-
-}
+  }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void Pixel::EndOfEvent(G4HCofThisEvent* /*hce*/)
 {
-  //G4cout << "\n-------->" <<  fHitsCollection->GetName() << ": in this event: " << G4endl;
-
-  //G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-
-  //G4int nofHits = fHitsCollection->entries();
-  //for ( G4int i=0; i<nofHits; i++ ) {
-  	//G4cout <<  "--------------coucou----------------" << G4endl;
-  	//PixelHit* hit = static_cast<PixelHit*>(fHitsCollection->GetHit(i));
-    //analysisManager->FillH1(0, hit->GetEdep());
-    //analysisManager->FillH1(0, hit->GetEdep());
-  //}
-}
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+}

@@ -38,15 +38,16 @@
 #include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "Randomize.hh"
+#include "G4SystemOfUnits.hh"
 
-namespace B1
+namespace ED
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 PrimaryGeneratorAction::PrimaryGeneratorAction()
 {
-  G4int n_particle = 10;
+  G4int n_particle = 1;
   fParticleGun  = new G4ParticleGun(n_particle);
 
   // default particle kinematic
@@ -99,10 +100,14 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
      "MyCode0002",JustWarning,msg);
   }
 
-  G4double x = 1300*um;
-  G4double y = 1300*um;
-  G4double x0 = x *G4UniformRand()-x *G4UniformRand();
-  G4double y0 = y *G4UniformRand()-y *G4UniformRand();
+  //G4double x = 1300*um;
+  //G4double y = 1300*um;
+  G4double R = 2*mm;
+  G4double theta = 2*M_PI*G4UniformRand();
+  G4double R0 = 500*G4UniformRand()*um; //R0 = 2*G4UniformRand()*mm
+
+  G4double x0 = R0 * std::cos(theta);
+  G4double y0 = R0 * std::sin(theta);
   G4double z0 = -0.5 * envSizeZ;
 
   fParticleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));

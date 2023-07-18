@@ -23,31 +23,30 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: ActionInitialization.hh 68058 2013-03-13 14:47:43Z gcosmo $
 //
-/// \file B1/include/ActionInitialization.hh
-/// \brief Definition of the B1::ActionInitialization class
+/// \file ActionInitialization.hh
+/// \brief Definition of the ActionInitialization class
 
-#ifndef B1ActionInitialization_h
-#define B1ActionInitialization_h 1
+#ifndef ActionInitialization_h
+#define ActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
 
-#include "PrimaryGeneratorAction.hh"
-#include "RunAction.hh"
-
 /// Action initialization class.
 
-namespace B1
+namespace ED
 {
 
 class ActionInitialization : public G4VUserActionInitialization
 {
   public:
-    ActionInitialization() = default;
-    ~ActionInitialization() override = default;
+    ActionInitialization();
+    ~ActionInitialization() override;
 
-    void BuildForMaster() const override;
     void Build() const override;
+
+    //void BuildForMaster() const override;
 };
 
 }
@@ -55,3 +54,5 @@ class ActionInitialization : public G4VUserActionInitialization
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 #endif
+
+

@@ -23,79 +23,105 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id$
 //
-/// \file exampleB1.cc
-/// \brief Main program of the B1 example
+/// \file exampleED.cc
+/// \brief Main program of the ED example
 
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
 
-#include "G4RunManagerFactory.hh"
-#include "G4SteppingVerbose.hh"
+#include "G4RunManager.hh"
 #include "G4UImanager.hh"
-#include "QBBC.hh"
+#include "G4PhysListFactory.hh"
 
 #include "G4VisExecutive.hh"
 #include "G4UIExecutive.hh"
 
-#include "Randomize.hh"
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-using namespace B1;
+namespace {
+  void PrintUsage() {
+    G4cerr << " Usage: " << G4endl;
+    G4cerr << " exampleB4a [-m macro ] [-p physList ] [-u UIsession]" << G4endl;
+    G4cerr << G4endl;
+  }
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 int main(int argc,char** argv)
 {
+  // Evaluate arguments
+  //
+  if ( argc > 7 ) {
+    PrintUsage();
+    return 1;
+  }
+
+  G4String macro;
+  G4String session;
+  G4String physicsListName;
+  for ( G4int i=1; i<argc; i=i+2 ) {
+    if      ( G4String(argv[i]) == "-m" ) macro = argv[i+1];
+    else if ( G4String(argv[i]) == "-u" ) session = argv[i+1];
+    else if ( G4String(argv[i]) == "-p" ) physicsListName = argv[i+1];
+    else {
+      PrintUsage();
+      return 1;
+    }
+  }
+
   // Detect interactive mode (if no arguments) and define UI session
   //
   G4UIExecutive* ui = nullptr;
-  if ( argc == 1 ) { ui = new G4UIExecutive(argc, argv); }
+  if ( ! macro.size() ) {
+    ui = new G4UIExecutive(argc, argv, session);
+  }
 
-  // Optionally: choose a different Random engine...
-  // G4Random::setTheEngine(new CLHEP::MTwistEngine);
-
-  //use G4SteppingVerboseWithUnits
-  G4int precision = 4;
-  G4SteppingVerbose::UseBestUnit(precision);
-
-  // Construct the default run manager
+  // Construct the run manager
   //
-  auto* runManager =
-    G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+  G4RunManager* runManager = new G4RunManager;
 
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new DetectorConstruction());
+  runManager->SetUserInitialization(new ED::DetectorConstruction());
 
   // Physics list
-  G4VModularPhysicsList* physicsList = new QBBC;
+  if ( physicsListName.size() == 0 ) physicsListName = "FTFP_BERT";
+  G4PhysListFactory physListFactory;
+  if ( ! physListFactory.IsReferencePhysList(physicsListName)) {
+    G4cerr << " Physics list " << physicsListName
+           << " is not defined." << G4endl;
+    return 1;
+  }
+  G4VModularPhysicsList* physicsList
+    = physListFactory.GetReferencePhysList(physicsListName);
   physicsList->SetVerboseLevel(1);
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ED::ActionInitialization());
 
   // Initialize visualization
   //
   G4VisManager* visManager = new G4VisExecutive;
   // G4VisExecutive can take a verbosity argument - see /vis/verbose guidance.
-  // G4VisManager* visManager = new G4VisExecutive("Quiet");
+  //G4VisManager* visManager = new G4VisExecutive("Quiet");
   visManager->Initialize();
 
   // Get the pointer to the User Interface manager
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
-  // Process macro or start UI session
-  //
-  if ( ! ui ) {
+  if ( macro.size() ) {
+    // batch mode
     // batch mode
     G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command+fileName);
+    UImanager->ApplyCommand(command+macro);
   }
   else {
-    // interactive mode
+    // interactive mode : define UI session
     UImanager->ApplyCommand("/control/execute init_vis.mac");
     ui->SessionStart();
     delete ui;

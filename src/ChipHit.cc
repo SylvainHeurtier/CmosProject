@@ -25,11 +25,11 @@
 //
 // $Id$
 //
-/// \file PixelHit.cc
-/// \brief Implementation of the PixelHit class
+/// \file ChipHit.cc
+/// \brief Implementation of the ChipHit class
 //
 
-#include "PixelHit.hh"
+#include "ChipHit.hh"
 
 #include "G4VVisManager.hh"
 #include "G4Circle.hh"
@@ -42,43 +42,62 @@ namespace ED
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4Allocator<PixelHit>* PixelHitAllocator = nullptr;
+G4Allocator<ChipHit>* ChipHitAllocator = nullptr;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PixelHit::PixelHit()
+ChipHit::ChipHit()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PixelHit::~PixelHit()
+ChipHit::~ChipHit()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PixelHit::PixelHit(const PixelHit& /*right*/)
+ChipHit::ChipHit(const ChipHit& /*right*/)
  : G4VHit()
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-const PixelHit& PixelHit::operator=(const PixelHit& /*right*/)
+const ChipHit& ChipHit::operator=(const ChipHit& /*right*/)
 {
   return *this;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-int PixelHit::operator==(const PixelHit& right) const
+int ChipHit::operator==(const ChipHit& right) const
 {
   return ( this == &right ) ? 1 : 0;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void PixelHit::Print()
+void ChipHit::Print()
 {
-  //G4cout << "To be implemented" << G4endl;
+  G4cout << "Chamber hit in layer: " << fLayerNumber
+         << "   time [s]: " << fTime/s
+         << "   position [mm]: " <<  fPosition/mm << G4endl;
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void ChipHit::Draw()
+{
+  G4VVisManager* pVVisManager = G4VVisManager::GetConcreteInstance();
+  if(pVVisManager)
+  {
+    G4Circle circle(fPosition);
+    circle.SetScreenSize(4.);
+    circle.SetFillStyle(G4Circle::filled);
+    G4Colour colour(1.,0.,0.);
+    G4VisAttributes attribs(colour);
+    circle.SetVisAttributes(attribs);
+    pVVisManager->Draw(circle);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

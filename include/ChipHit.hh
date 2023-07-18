@@ -25,62 +25,71 @@
 //
 // $Id$
 //
-/// \file PixelHit.cc
-/// \brief Implementation of the PixelHit class
+/// \file ChipHit.hh
+/// \brief Definition of the ChipHit class
 //
 
-#include "PixelHit.hh"
+#ifndef ChipHit_h
+#define ChipHit_h 1
 
-#include "G4VVisManager.hh"
-#include "G4Circle.hh"
-#include "G4Colour.hh"
-#include "G4VisAttributes.hh"
-#include "G4SystemOfUnits.hh"
+#include "G4VHit.hh"
+#include "G4THitsCollection.hh"
+#include "G4Allocator.hh"
+#include "G4ThreeVector.hh"
 
 namespace ED
 {
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4Allocator<PixelHit>* PixelHitAllocator = nullptr;
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::PixelHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::~PixelHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-PixelHit::PixelHit(const PixelHit& /*right*/)
- : G4VHit()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-const PixelHit& PixelHit::operator=(const PixelHit& /*right*/)
+class ChipHit : public G4VHit
 {
-  return *this;
-}
+  public:
+    ChipHit();
+    ~ChipHit() override;
+    ChipHit(const ChipHit& right);
+    const ChipHit& operator=(const ChipHit& right);
+    int operator==(const ChipHit &right) const;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+    inline void* operator new(size_t);
+    inline void  operator delete(void* hit);
 
-int PixelHit::operator==(const PixelHit& right) const
+    void Print() override;
+    void Draw() override;
+
+    // setter methods
+    void SetLayerNumber(G4int number) { fLayerNumber = number; }
+    void SetTime(G4double time)       { fTime = time; }
+    void SetPosition(G4ThreeVector position) { fPosition = position; }
+
+    // getter methods
+    G4int          GetLayerNumber() const { return fLayerNumber;}
+    G4double       GetTime() const        { return fTime; }
+    G4ThreeVector  GetPosition() const    { return fPosition; }
+
+  private:
+    // data members
+    G4int          fLayerNumber = -1;
+    G4double       fTime = 0.;
+    G4ThreeVector  fPosition;
+};
+
+typedef G4THitsCollection<ChipHit> ChipHitsCollection;
+
+extern G4Allocator<ChipHit>* ChipHitAllocator;
+
+inline void* ChipHit::operator new(size_t)
 {
-  return ( this == &right ) ? 1 : 0;
+  if (! ChipHitAllocator)
+        ChipHitAllocator = new G4Allocator<ChipHit>;
+  return (void*)ChipHitAllocator->MallocSingle();
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void PixelHit::Print()
+inline void ChipHit::operator delete(void* hit)
 {
-  //G4cout << "To be implemented" << G4endl;
+  ChipHitAllocator->FreeSingle((ChipHit*) hit);
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 }
+
+#endif
+
+

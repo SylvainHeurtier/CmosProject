@@ -27,8 +27,8 @@
 /// \file B1/include/PrimaryGeneratorAction.hh
 /// \brief Definition of the B1::PrimaryGeneratorAction class
 
-#ifndef B1PrimaryGeneratorAction_h
-#define B1PrimaryGeneratorAction_h 1
+#ifndef PrimaryGeneratorAction_h
+#define PrimaryGeneratorAction_h 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
@@ -43,7 +43,7 @@ class G4Box;
 /// The default kinematic is a 6 MeV gamma, randomly distribued
 /// in front of the phantom across 80% of the (X,Y) phantom size.
 
-namespace B1
+namespace ED
 {
 
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
