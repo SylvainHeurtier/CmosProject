@@ -37,11 +37,9 @@ void Pixel::Initialize(G4HCofThisEvent* hce)
 {
   G4String hcName = SensitiveDetectorName + "HitsCollection";
 
-  fHitsCollection = new HitCollection(SensitiveDetectorName, hcName);
 
   G4int hcID
     = G4SDManager::GetSDMpointer()->GetCollectionID(hcName);
-  hce->AddHitsCollection( hcID, fHitsCollection );
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -74,11 +72,9 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
   // Pixel hit collection used for printout
   PixelHit* newHit = new PixelHit();
   newHit->SetTime(time);
-  fHitsCollection->insert(newHit);
   newHit->SetPosition(position);
   newHit->SetLayerNumber(copyNo);
   // Add hit in the collection
-  fHitsCollection->insert(newHit);
 
 
   // Name particle
@@ -156,14 +152,7 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 
 void Pixel::EndOfEvent(G4HCofThisEvent* /*hce*/)
 {
-  //G4cout << "\n-------->" <<  fHitsCollection->GetName() << ": in this event: " << G4endl;
 
-  //G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
-
-  G4int nofHits = fHitsCollection->entries();
-  for ( G4int i=0; i<nofHits; i++ ) {
-    (*fHitsCollection)[i]->Print();
-  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

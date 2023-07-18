@@ -279,7 +279,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   while(i<10) {
     // chips in the planes
     char chip_name_sv[100];
-    sprintf(chip_name_sv, "Chip%d",i);
+    sprintf(chip_name_sv, "Chip%d",i+1);
     if(i<6) ConstructChip(chip_name_sv,i+1,shape_dz_IB, Z[i], "G4_Si", nullptr, logicEnv, false); //Test=0
     i=i+1;
     }

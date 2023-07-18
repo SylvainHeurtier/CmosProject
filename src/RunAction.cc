@@ -46,18 +46,18 @@ RunAction::RunAction()
   // Create analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetVerboseLevel(1);
-  analysisManager->SetNtupleMerging(true);
+  // analysisManager->SetNtupleMerging(true);
 
   // Creating ntuples for the sensitive chip
   // ntuple id = 0
   
   analysisManager->CreateNtuple("Chip0", "Chip 0 hits");
-  analysisManager->CreateNtupleIColumn("Ligne");       // column id = 0
-  analysisManager->CreateNtupleIColumn("Colonne");       // column id = 1
-  analysisManager->CreateNtupleDColumn("time");    // column id = 2
-  analysisManager->CreateNtupleDColumn("Edep");    // column id = 3
+  analysisManager->CreateNtupleIColumn("Ligne");       // column id    = 0
+  analysisManager->CreateNtupleIColumn("Colonne");       // column id  = 1
+  analysisManager->CreateNtupleDColumn("time");    // column id        = 2
+  analysisManager->CreateNtupleDColumn("Edep");    // column id        = 3
   analysisManager->CreateNtupleIColumn("NumParticle");    // column id = 4
-  //analysisManager->CreateNtupleIColumn("PDGcode"); // column id = 5
+  analysisManager->CreateNtupleIColumn("PDGcode"); // column id        = 5
   //analysisManager->CreateNtupleDColumn("charge");         // column id = 6
   analysisManager->FinishNtuple();
 }

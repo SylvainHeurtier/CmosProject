@@ -31,7 +31,6 @@ public:
 	void   EndOfEvent(G4HCofThisEvent* hce) override;
 
 private:
-	HitCollection* fHitsCollection = nullptr;
 	G4int fNtupleId = 0;
 };
 }

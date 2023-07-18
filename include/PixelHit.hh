@@ -59,7 +59,7 @@ private:
 };
 
 // Define the "hit collection" using the template class G4THitsCollection:
-typedef G4THitsCollection<PixelHit> HitCollection;
+// typedef G4THitsCollection<PixelHit> HitCollection;
 
 
 extern G4Allocator<PixelHit>* PixelHitAllocator;
