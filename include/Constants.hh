@@ -30,7 +30,7 @@ const int npxl_col = 100; //more columns = more pixels along the x axis
 const double angle = 0.;
 
 // Name of the ROOT file
-const G4String fileName = "ED_PixelTouched.root";
+const G4String fileName = "ED_ToMadeCluster4.root";
 }
 
 #endif

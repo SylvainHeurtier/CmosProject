@@ -22,7 +22,7 @@
 /gun/particle pi+
 /gun/energy 6 GeV
 #
-/run/beamOn 1000
+/run/beamOn 1000000
 
 
 # 
