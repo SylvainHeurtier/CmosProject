@@ -48,8 +48,10 @@ namespace ED
 
 PrimaryGeneratorAction::PrimaryGeneratorAction()
 {
-  G4int n_particle = 1;
+  G4int n_particle = 200;
   fGPS  = new G4GeneralParticleSource();
+  //fGPS->SetNumberOfParticles(n_particle);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

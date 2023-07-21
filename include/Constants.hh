@@ -23,14 +23,14 @@ const G4double Ypix=29*um;
 const G4double epaisseur = 25*um; //25*um
 
 // number of row and number of column for a chip 
-const int npxl_row = 50; //more rows = more pixels along the y axis
-const int npxl_col = 100; //more columns = more pixels along the x axis
+const int npxl_row = 100; //more rows = more pixels along the y axis
+const int npxl_col = 50; //more columns = more pixels along the x axis
 
 // Angle of the chip with the vertical axis
-const double angle = 0.;
+const double angle = 70;
 
 // Name of the ROOT file
-const G4String fileName = "ED_ToMadeCluster4.root";
+const G4String fileName = "ED_TestBeam5.root";
 }
 
 #endif

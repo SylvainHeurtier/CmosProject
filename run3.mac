@@ -2,7 +2,7 @@
 # Macro file for example ED
 #
 # Can be run in batch, without graphic
-# or interactively: Idle> /control/execute run1.mac
+# or interactively: Idle> /control/execute run3.mac
 #
 # Change the default number of workers (in multi-threading mode)
 #/run/numberOfThreads 4
@@ -13,31 +13,40 @@
 /control/verbose 0
 /run/verbose 0
 /event/verbose 0
-/tracking/verbose 1
-#
-# pion 6 GeV to the direction (0.,0.,1.)
-#
-#/gun/particle pi+
-#/gun/energy 6 GeV
+/tracking/verbose 0
+#_____________________
+#_____________________
 #
 # Primaries
 /gps/particle pi+
 /gps/ene/type Gauss
 /gps/ene/mono 6 GeV # changing this value in a parametric run
 /gps/ene/sigma 0.15 GeV # changing this value in a parametric run
-
-# shape
-#/gps/pos/type Plane
-#/gps/pos/shape Circle 
-#/gps/pos/centre 0. 0. 1 mm
-#/gps/pos/radius 0.5 mm
-#/gps/pos/sigma_x 0.5 mm
-#/gps/pos/sigma_y 0.5 mm
-
-/gps/direction 0 0 -1
-/gps/pos/centre 0 0 1 mm
+#_____________________
+#
+#Sets the source positional distribution type: Point [default], Plane, Beam, Surface, Volume.
 /gps/pos/type Beam
+#_____________________
 #
+# Sets the centre co-ordinates (X,Y,Z) of the source [default (0,0,0) cm].
+# (The units can be micron, mm, cm, m or km)
+#/gps/position 0 0 -120 mm
+#_____________________
 #
-/run/beamOn 100
+#Sets the source shape type, after /gps/pos/type has been used. 
+#For a Plane this can be Circle, Annulus, Ellipse, Square, Rectangle. 
+#For both Surface or Volume sources this can be Sphere, Ellipsoid, Cylinder, Para (parallelepiped).
+/gps/pos/shape Circle
+#_____________________
+#
+/gps/pos/centre 0 0 -120 mm
+/gps/pos/radius 0.4 mm
+#/gps/pos/sigma_r 0.1 mm
+#_____________________
+#
+# Set the momentum direction [default (1,0,0)] of generated particles using
+/gps/direction 0 0 1 
+#_____________________
+#
+/run/beamOn 50
 #
