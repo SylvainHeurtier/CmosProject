@@ -6,6 +6,8 @@
 #include "TLatex.h"
 #include "TAttMarker.h"
 #include "TStyle.h"
+#include "TCanvas.h"
+#include "TPaletteAxis.h"
 
 
 ////////////////////////////////////////////////////////////////////

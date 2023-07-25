@@ -19,6 +19,7 @@
 #
 # Primaries
 /gps/particle pi+
+/gps/number 1000 #number of particles by bunch
 /gps/ene/type Gauss
 /gps/ene/mono 6 GeV # changing this value in a parametric run
 /gps/ene/sigma 0.15 GeV # changing this value in a parametric run
@@ -48,5 +49,5 @@
 /gps/direction 0 0 1 
 #_____________________
 #
-/run/beamOn 50
+/run/beamOn 1000
 #
