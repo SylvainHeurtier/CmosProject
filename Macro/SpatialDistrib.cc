@@ -226,8 +226,35 @@ void SpatialDistrib(){
 	histoXYE->SetFillColor(kRed);
 
 	c3->SaveAs("EnergyXY.pdf");
-////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////
+//                         Graph 4
+////////////////////////////////////////////////////////////////////
+	TFile* f4= new TFile(ED_e50um,"read");
+	TTree* tree4 = (TTree*) f4-> Get(treename);
+
+	TCanvas* c4 = new TCanvas;
+	//c4->SetFillStyle(3001);
+	//c4->SetFillColor(kGray);
+
+	//********* Histo 3D : X - Y - Edep ************//
+ 	
+ 	c4->cd();
+	c4->SetGrid();
+	tree->Draw("Edep:Zposition:Xposition>>Title4(50,-5,5,50,-0.03,0.03,20,0,0.6", "","box");
+	auto histoXZE = (TH3D*)gPad->GetPrimitive("Title4");
+	histoXZE->SetTitle("#font[12]{Distribution of hit};#font[12]{X axis (mm) }");
+	histoXZE->GetYaxis()->SetTitle("#font[12]{Z axis (mm) }");
+	histoXZE->GetZaxis()->SetTitle("#font[12]{Energy (MeV) }");
+	//histoXZE->SetMarkerColorAlpha(kBlue, 0.35);
+	//histoXZE->Draw("COLZ BOX");
+	histoXZE->Draw("BOX2");
+	histoXZE->SetFillColor(kRed);
+
+	c4->SaveAs("EnergyXZ.pdf");
+
+////////////////////////////////////////////////////////////////////
+	
 	//c->SaveAs("Graph.pdf");
 	//f->Close();
 }

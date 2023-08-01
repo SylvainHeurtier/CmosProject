@@ -19,7 +19,7 @@
 #
 # Primaries
 /gps/particle pi+
-/gps/number 1000 #number of particles by bunch
+/gps/number 10000 #number of particles by bunch
 /gps/ene/type Gauss
 /gps/ene/mono 6 GeV # changing this value in a parametric run
 /gps/ene/sigma 0.15 GeV # changing this value in a parametric run
@@ -41,13 +41,13 @@
 #_____________________
 #
 /gps/pos/centre 0 0 -120 mm
-/gps/pos/radius 0.4 mm
-#/gps/pos/sigma_r 0.1 mm
+/gps/pos/radius 30 um
+#/gps/pos/sigma_r 0.1 um
 #_____________________
 #
 # Set the momentum direction [default (1,0,0)] of generated particles using
 /gps/direction 0 0 1 
 #_____________________
 #
-/run/beamOn 1000
+/run/beamOn 100
 #

@@ -126,8 +126,8 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
 
   //Division euclidienne pour récupérer les coordonnées du pixel:
   //Npix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
-  int L = npxl_row - Npix % npxl_row;
-  int C = (Npix-L) / npxl_row;
+  int L = npxl_row - Npix % npxl_row; // car Npix % npxl_row = (npxl_row - L)
+  int C = Npix / npxl_row;
 
 	// Add hits properties in the ntuple
   analysisManager->FillNtupleIColumn(fNtupleId, 0, L);
