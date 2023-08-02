@@ -25,8 +25,8 @@
 //
 // $Id$
 //
-/// \file exampleED.cc
-/// \brief Main program of the ED example
+/// \file run_simulation.cc
+/// \brief Main program to run the simulation
 
 #include "DetectorConstruction.hh"
 #include "ActionInitialization.hh"
@@ -86,7 +86,7 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager->SetUserInitialization(new ED::DetectorConstruction());
+  runManager->SetUserInitialization(new Cmos_test_bench::DetectorConstruction());
 
   // Physics list
   if ( physicsListName.size() == 0 ) physicsListName = "FTFP_BERT";
@@ -102,7 +102,7 @@ int main(int argc,char** argv)
   runManager->SetUserInitialization(physicsList);
 
   // User action initialization
-  runManager->SetUserInitialization(new ED::ActionInitialization());
+  runManager->SetUserInitialization(new Cmos_test_bench::ActionInitialization());
 
   // Initialize visualization
   //
@@ -115,7 +115,6 @@ int main(int argc,char** argv)
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   if ( macro.size() ) {
-    // batch mode
     // batch mode
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);

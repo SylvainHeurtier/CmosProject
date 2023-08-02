@@ -37,7 +37,7 @@
 #include "G4Allocator.hh"
 #include "G4ThreeVector.hh"
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class ChipHit : public G4VHit

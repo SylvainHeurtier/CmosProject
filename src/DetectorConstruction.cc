@@ -25,7 +25,7 @@
 #include "G4Colour.hh"
 #include "stdlib.h"
 
-namespace ED
+namespace Cmos_test_bench
 {
 
   // Option to switch on/off checking of volumes overlaps

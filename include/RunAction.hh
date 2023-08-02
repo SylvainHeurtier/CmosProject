@@ -38,7 +38,7 @@ class G4Run;
 
 /// Run action class
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class RunAction : public G4UserRunAction

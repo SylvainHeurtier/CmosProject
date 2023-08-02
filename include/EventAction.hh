@@ -38,7 +38,7 @@ class G4GenericMessenger;
 
 /// Event action class
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class EventAction : public G4UserEventAction

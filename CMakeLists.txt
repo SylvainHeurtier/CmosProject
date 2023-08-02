@@ -2,7 +2,7 @@
 # Setup the project
 cmake_minimum_required(VERSION 3.16...3.21)
 
-project(ED)
+project(Cmos_test_bench)
 
 #----------------------------------------------------------------------------
 # Find Geant4 package, activating all available UI and Vis drivers by default
@@ -34,22 +34,22 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(exampleED exampleED.cc ${sources} ${headers})
-target_link_libraries(exampleED ${Geant4_LIBRARIES})
+add_executable(run_simulation run_simulation.cc ${sources} ${headers})
+target_link_libraries(run_simulation ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build ED. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(EXAMPLEED_SCRIPTS
+set(run_simulation_SCRIPTS
   init_vis.mac
   run.mac
   run.png
   vis.mac
   )
 
-foreach(_script ${EXAMPLEED_SCRIPTS})
+foreach(_script ${run_simulation_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
@@ -61,11 +61,11 @@ endforeach()
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
 #
-add_custom_target(ED DEPENDS exampleED)
+add_custom_target(Cmos_test_bench DEPENDS run_simulation)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS exampleED DESTINATION bin)
+install(TARGETS run_simulation DESTINATION bin)
 
 

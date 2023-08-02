@@ -37,7 +37,7 @@ class G4VPhysicalVolume;
 
 /// Detector construction class to define materials and geometry.
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class DetectorConstruction : public G4VUserDetectorConstruction

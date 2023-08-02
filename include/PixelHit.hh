@@ -11,7 +11,7 @@
 #include "G4ThreeVector.hh"
 
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class PixelHit : public G4VHit 

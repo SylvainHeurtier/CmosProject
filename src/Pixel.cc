@@ -19,7 +19,7 @@
 #include<string>
 using namespace std;
 
-namespace ED
+namespace Cmos_test_bench
 {
 Pixel::Pixel(const G4String& SDname, G4int ntupleID)
  : G4VSensitiveDetector(SDname),fNtupleId(ntupleID){

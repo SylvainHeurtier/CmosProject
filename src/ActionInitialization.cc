@@ -33,7 +33,7 @@
 #include "EventAction.hh"
 #include "RunAction.hh"
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

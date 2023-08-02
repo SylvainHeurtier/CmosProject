@@ -35,7 +35,7 @@
 
 /// Action initialization class.
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class ActionInitialization : public G4VUserActionInitialization

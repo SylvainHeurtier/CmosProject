@@ -38,7 +38,7 @@
 #include "G4Step.hh"
 #include "G4ios.hh"
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

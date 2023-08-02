@@ -39,7 +39,7 @@ class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
-namespace ED
+namespace Cmos_test_bench
 {
 
 class ChipSD : public G4VSensitiveDetector
