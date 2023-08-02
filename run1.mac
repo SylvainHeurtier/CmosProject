@@ -19,17 +19,19 @@
 #
 # gamma 6 MeV to the direction (0.,0.,1.)
 #
-/gun/particle pi+
-/gun/energy 6 GeV
+#/gun/particle pi+
+#/gun/energy 6 GeV
 #
-/run/beamOn 1000
+#/run/beamOn 1000000
 
 
 # 
 # proton 210 MeV to the direction (0.,0.,1.)
 #
-#/gun/particle proton
-#/gun/energy 210 MeV
-#/tracking/verbose 2
+/gps/particle pi+
+/gps/pos/type Point
+/gps/pos/centre 1. 2. 1. cm
+/gps/ang/type iso
+/gps/energy 2. MeV
 #
-#/run/beamOn 1
+/run/beamOn 200

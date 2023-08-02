@@ -13,6 +13,7 @@
 #include "G4Step.hh"
 #include "G4ios.hh"
 #include "G4EventManager.hh"
+#include "G4RunManager.hh"
 
 #include<iostream>
 #include<string>
@@ -61,18 +62,18 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
   G4ThreeVector position = preStepPoint->GetPosition();
   // energy deposit
   G4double edep = step->GetTotalEnergyDeposit();
+  /*
   // The GPD code
   G4int Nbcode = step->GetTrack()->GetDynamicParticle()->GetPDGcode();
   // Layer number
   const G4VTouchable* touchable = preStepPoint->GetTouchable();
   G4int copyNo = touchable->GetCopyNumber(1);
-
+*/
   // Pixel hit collection used for printout
   PixelHit* newHit = new PixelHit();
   newHit->SetTime(time);
-
   newHit->SetPosition(position);
-  newHit->SetLayerNumber(copyNo);
+  //newHit->SetLayerNumber(copyNo);
   // Add hit in the collection
 
   // Name particle
@@ -102,8 +103,11 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
     NumParticle=0;
 
   //Get current event
-  G4int EventID = G4EventManager::GetEventManager()->GetCurrentEvent()->GetEventID();
-  	
+  //G4int EventID = G4EventManager::GetEventManager()->GetCurrentEvent()->GetEventID();
+  G4int EventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+  //Get Track
+  G4int TrackID = step->GetTrack()->GetTrackID();
+
   // Add hits properties in the ntuple
   G4AnalysisManager* analysisManager = G4AnalysisManager::Instance();
 
@@ -121,16 +125,17 @@ G4bool Pixel::ProcessHits(G4Step *step, G4TouchableHistory*)
   }
 
   //Division euclidienne pour récupérer les coordonnées du pixel:
-  //Npix = (npxl_col*2+1)*C + L avec C le numéro de colonne et L de la ligne
-  int L = Npix % (npxl_col*2+1);
-  int C = (Npix-L) / (npxl_col*2+1);
+  //Npix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+  int L = npxl_row - Npix % npxl_row; // car Npix % npxl_row = (npxl_row - L)
+  int C = Npix / npxl_row;
 
 	// Add hits properties in the ntuple
   analysisManager->FillNtupleIColumn(fNtupleId, 0, L);
   analysisManager->FillNtupleIColumn(fNtupleId, 1, C);
-  analysisManager->FillNtupleDColumn(fNtupleId, 2, time);
-  analysisManager->FillNtupleDColumn(fNtupleId, 3, edep);
-  //analysisManager->FillNtupleIColumn(fNtupleId, 4, NumParticle);
+  analysisManager->FillNtupleDColumn(fNtupleId, 2, edep);
+  analysisManager->FillNtupleIColumn(fNtupleId, 3, EventID);
+  analysisManager->FillNtupleIColumn(fNtupleId, 4, TrackID);
+  analysisManager->FillNtupleIColumn(fNtupleId, 4, NumParticle);
   analysisManager->AddNtupleRow(fNtupleId);
 	
 	return true;
