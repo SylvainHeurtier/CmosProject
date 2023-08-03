@@ -9,6 +9,7 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "THStack.h"
+#include "TRandom.h"
 
 #include <iostream>
 #include <vector>
@@ -1120,10 +1121,26 @@ void Clusterisation2(const char* filename,
 
 
 
-/*
 
-void PixelAdvanced(char* filename){
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void PixelAdvanced(char* filename, double Fleak, int theta){
+
+	char NameNewFile[100];
+ 	sprintf(NameNewFile, "PixelAdvanced_%ddeg.root", theta);
 
    	TFile* f_init= new TFile(filename,"read");
 	TTree* InitTree = (TTree*) f_init-> Get("Chip0");
@@ -1131,71 +1148,224 @@ void PixelAdvanced(char* filename){
 	int n_entries = InitTree->GetEntries();
 
  	int n, row, col, numEvent;
+ 	double EnergyDeposit;
 	InitTree->SetBranchAddress("EventID", &numEvent);
 	InitTree->SetBranchAddress("Ligne", &row);
 	InitTree->SetBranchAddress("Colonne", &col);
-	InitTree->SetBranchAddress("Colonne", &col);
 	InitTree->SetBranchAddress("Edep", &EnergyDeposit);
-	InitTree->SetBranchAddress("TrackID", &traID);
-	InitTree->SetBranchAddress("NumParticle", &numPart);
 
 	//create a Tree file tree1.root
    	//create the file, the Tree and a few branches
-   	TFile f_final("PixelAdvanced.root","recreate");
+   	
    	TTree FinalTree("FinalTree","name");
 
-	Int_t Ligne, Colonne, EventID, Edep, Enoise, Eleak, Eshared, EventID, TrackID, NumParticle;
-	
+	int Ligne, Colonne, EventID;
+	double Edep, Enoise, Eleak, Ecrosstalk;
+
 	FinalTree.Branch("Ligne",&Ligne,"Ligne/I");
 	FinalTree.Branch("Colonne",&Colonne,"Colonne/I");
 	FinalTree.Branch("EventID",&EventID,"EventID/I");
-	FinalTree.Branch("Edep",&Edep,"Edep/I");
-	FinalTree.Branch("Enoise",&Enoise,"Enoise/I");
-	FinalTree.Branch("Eleak",&Eleak,"Eleak/I");
-	FinalTree.Branch("Eshared",&Eshared,"Eshared/I");
-	FinalTree.Branch("EventID",&EventID,"EventID/I");
-	FinalTree.Branch("TrackID",&TrackID,"TrackID/I");
-	FinalTree.Branch("NumParticle",&NumParticle,"NumParticle/I");
+	FinalTree.Branch("Edep",&Edep,"Edep/D");
+	FinalTree.Branch("Enoise",&Enoise,"Enoise/D");
+	FinalTree.Branch("Eleak",&Eleak,"Eleak/D");
+	FinalTree.Branch("Ecrosstalk",&Ecrosstalk,"Ecrosstalk/D");
 
-	int n_pixels_tot = npxl_row*npxl_col;
+	double TabEdep[npxl_row][npxl_col];
+	double TabEleak[npxl_row][npxl_col];
+	double TabEcrosstalk[npxl_row][npxl_col];
+	double TabEnoise[npxl_row][npxl_col];
 
 	//Initialisation
-	TreeInit->GetEntry(0);
+	InitTree->GetEntry(0);
+	int eID = numEvent;
 
-	for(int i=0; i<n_entries; i++){
-		TreeInit->GetEntry(i);
-
-		if(row>0 && row<npxl_row-1 && col>0 && col<npxl_col-1 ){
-
+	for (int r=0; r<npxl_row; r++){
+		for (int c=0; c<npxl_col; c++){
+			TabEdep[r][c] = 0;
+			TabEleak[r][c] = 0;
+			TabEcrosstalk[r][c] = 0;
+			TabEnoise[r][c] = 0;
 		}
-
-		if(row==0){
-			Ligne=row+1;
-			Colonne=col+1;
-			EventID=numEvent;
-			Eshared==
-			Enoise=TRandom::Gauss(0,0.01); 
-			//TRandom::Gaus(Double_t mean=0, Double_t sigma=1)
-		}
-
-		if(col==0){
-			Enoise=TRandom::Gauss(0,0.01); 
-		}
-
-		if(row==npxl_row-1){
-			Enoise=TRandom::Gauss(0,0.01); 
-		}
-
-		if(col==npxl_col-1){
-			Enoise=TRandom::Gauss(0,0.01); 
-		}
-
 	}
+	TRandom *Random = new TRandom();
+
+	//Loop on all events
+	for(int i=0; i<n_entries; i++){
+		InitTree->GetEntry(i);
+		if(eID==numEvent){
+			//cout<<"******** i = "<< i << "********" <<endl;
+
+			TabEdep[row][col] += EnergyDeposit;
+			TabEnoise[row][col] = Random->Gaus(0,0.01);
+
+			if(row>0 && row<npxl_row-1 && col>0 && col<npxl_col-1 ){
+				//Pixel au dessus
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row+1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row+1][col] = Random->Gaus(0,0.01); //Random->Gaus(Double_t mean=0, Double_t sigma=1)
+				//Pixel à droite
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);
+				//Pixel en dessous
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);
+				//Pixel à gauche
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col-1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col-1] = Random->Gaus(0,0.01);
+			}
+
+			if(row==0){ 
+				//Pixel au dessus
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row+1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row+1][col] = Random->Gaus(0,0.01);
+			}
+
+			if(col==0){
+				//Pixel à droite
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);				
+			}
+
+			if(row==npxl_row-1){
+				//Pixel en dessous
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row-1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row-1][col] = Random->Gaus(0,0.01);
+			}
+
+			if(col==npxl_col-1){
+				//Pixel à gauche
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col-1] += Fleak;
+				TabEnoise[row][col-1] = Random->Gaus(0,0.01);
+			}
+			// last entries
+			if(i==n_entries-1){
+				for (int r=0; r<npxl_row; r++){
+					for (int c=0; c<npxl_col; c++){
+						if(TabEdep[r][c] >0 || TabEleak[r][c] <0 || TabEcrosstalk[r][c] >0 || TabEnoise[r][c]<0){
+							Ligne=r;
+							Colonne=c;
+
+							InitTree->GetEntry(i-1);
+							EventID=numEvent;
+							InitTree->GetEntry(i);
+
+							Edep = TabEdep[r][c];
+							Enoise = TabEnoise[r][c];
+							Eleak = TabEleak[r][c];
+							Ecrosstalk = TabEcrosstalk[r][c];
+						}
+					}
+				}
+				FinalTree.Fill();
+			}
+		}
+			
+		else {
+			//cout<<"******** i = "<< i << "********" <<endl;
+			for (int r=0; r<npxl_row; r++){
+				for (int c=0; c<npxl_col; c++){
+					if(TabEdep[r][c] >0 || TabEleak[r][c] <0 || TabEcrosstalk[r][c] >0 || TabEnoise[r][c]<0){
+						Ligne=r;
+						Colonne=c;
+
+						InitTree->GetEntry(i-1);
+						EventID=numEvent;
+						InitTree->GetEntry(i);
+
+						Edep = TabEdep[r][c];
+						Eleak = TabEleak[r][c];
+						Enoise = TabEnoise[r][c];
+						Ecrosstalk = TabEcrosstalk[r][c];
+					}
+				}
+			}
+			FinalTree.Fill();
 
 
+			//cout<<"PLOUF" <<endl;
+			
+			//Reset
+			//
+			eID=numEvent;
+			for (int r=0; r<npxl_row; r++){
+				for (int c=0; c<npxl_col; c++){
+					TabEdep[r][c] = 0;
+					TabEleak[r][c] = 0;
+					TabEcrosstalk[r][c] = 0;
+					TabEnoise[r][c] = 0;
+				}
+			}
+
+			TabEdep[row][col] += EnergyDeposit;
+			TabEnoise[row][col] = Random->Gaus(0,0.01);
+
+			if(row>0 && row<npxl_row-1 && col>0 && col<npxl_col-1 ){
+				//Pixel au dessus
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row+1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row+1][col] = Random->Gaus(0,0.01); //Random->Gaus(Double_t mean=0, Double_t sigma=1)
+				//Pixel à droite
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);
+				//Pixel en dessous
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);
+				//Pixel à gauche
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col-1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col-1] = Random->Gaus(0,0.01);
+			}
+
+			if(row==0){ 
+				//Pixel au dessus
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row+1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row+1][col] = Random->Gaus(0,0.01);
+			}
+
+			if(col==0){
+				//Pixel à droite
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col+1] += Fleak*EnergyDeposit;
+				TabEnoise[row][col+1] = Random->Gaus(0,0.01);				
+			}
+
+			if(row==npxl_row-1){
+				//Pixel en dessous
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row-1][col] += Fleak*EnergyDeposit;
+				TabEnoise[row-1][col] = Random->Gaus(0,0.01);
+			}
+
+			if(col==npxl_col-1){
+				//Pixel à gauche
+				TabEleak[row][col] -= Fleak*EnergyDeposit;
+				TabEcrosstalk[row][col-1] += Fleak;
+				TabEnoise[row][col-1] = Random->Gaus(0,0.01);
+			}
+		}
+	}
+	cout<<"--------------------------------"<<endl;
+	cout<<" "<<endl;cout<<"*** Pixel advanced ***"<<endl;
+
+	f_init->Close();
+
+	TFile f_final(NameNewFile,"recreate");
+	FinalTree.Write();
+
+	f_final.Close();
+
+	cout<<"Write ok"<<endl;
 }
-*/
-
 
 
 
@@ -1216,6 +1386,672 @@ void PixelAdvanced(char* filename){
 
 
 void Clusterisation(){
+
+	double Ethreshold = 0.01; // MeV
+
+	char* file0 = "~/bin/CmosProject/build/ED_0deg_100Evt_10000part_radius30um.root";
+	char* file10 = "~/bin/CmosProject/build/ED_10deg_100Evt_10000part_radius30um.root";
+	char* file20 = "~/bin/CmosProject/build/ED_20deg_100Evt_10000part_radius30um.root";
+	char* file30 = "~/bin/CmosProject/build/ED_30deg_100Evt_10000part_radius30um.root";
+	char* file40 = "~/bin/CmosProject/build/ED_40deg_100Evt_10000part_radius30um.root";
+	char* file50 = "~/bin/CmosProject/build/ED_50deg_100Evt_10000part_radius30um.root";
+	char* file60 = "~/bin/CmosProject/build/ED_60deg_100Evt_10000part_radius30um.root";
+
+	PixelAdvanced( file0, 0.01, 0);
+	cout<<"PixelAdvanced( file0, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file10, 0.01, 10);
+	cout<<"PixelAdvanced( file10, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file20, 0.01, 20);
+	cout<<"PixelAdvanced( file20, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file30, 0.01, 30);
+	cout<<"PixelAdvanced( file30, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file40, 0.01, 40);
+	cout<<"PixelAdvanced( file40, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file50, 0.01, 50);
+	cout<<"PixelAdvanced( file50, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	PixelAdvanced( file60, 0.01, 60);
+	cout<<"PixelAdvanced( file60, 0.01, 0) - OK"<<endl;cout<<" "<<endl;
+	cout<<"--------------------------------"<<endl;
+
+	const char* filename0 = "~/bin/CmosProject/Macro/PixelAdvanced_0deg.root";
+	const char* filename10 = "~/bin/CmosProject/Macro/PixelAdvanced_10deg.root";
+	const char* filename20 = "~/bin/CmosProject/Macro/PixelAdvanced_20deg.root";
+	const char* filename30 = "~/bin/CmosProject/Macro/PixelAdvanced_30deg.root";
+	const char* filename40 = "~/bin/CmosProject/Macro/PixelAdvanced_40deg.root";
+	const char* filename50 = "~/bin/CmosProject/Macro/PixelAdvanced_50deg.root";
+	const char* filename60 = "~/bin/CmosProject/Macro/PixelAdvanced_60deg.root";
+
+	//************************************************//
+
+	TCanvas* c = new TCanvas;
+	c->SetGrid();
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 0 deg
+////////////////////////////////////////////////////////////////////
+   	
+   	TFile* f0= new TFile(filename0,"read");
+	TTree* tree0 = (TTree*) f0-> Get("FinalTree");
+
+	int n_entries = tree0->GetEntries();
+ 	int n, row, col, numEvent;
+	tree0->SetBranchAddress("EventID", &numEvent);
+	tree0->SetBranchAddress("Ligne", &row);
+	tree0->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster0("tCluster0.root","recreate");
+   	TTree tCluster0("tCluster0","name40");
+
+	Int_t NumShape;
+	tCluster0.Branch("NumShape",&NumShape,"NumShape/I");
+
+	int n_pixels_tot = npxl_row*npxl_col;
+	int NumHits;
+	int* ListClusterID;
+	int NumCluster;
+	int num_pix;
+
+	int* pixels_hit = (int*)malloc(n_pixels_tot*sizeof(int));
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree0->GetEntry(0);
+	int eID = numEvent;
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree0->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster0.Fill();
+					cout<<"tCluster0.Fill()"<<endl;
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster0.Fill();
+				cout<<"tCluster0.Fill()"<<endl;
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster0.Write();
+
+	tCluster0.Draw("NumShape>>Clusterisation0(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster0 = (TH1D*)gPad->GetPrimitive("Clusterisation0");
+	histoCluster0->SetLineColor(kOrange);
+	//histoCluster0->SetFillStyle(3004);
+    histoCluster0->SetFillColor(kOrange);
+    histoCluster0->Scale(1./histoCluster0->Integral(), "width");
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 10deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f10= new TFile(filename10,"read");
+	TTree* tree10 = (TTree*) f10-> Get("FinalTree");
+
+	tree10->SetBranchAddress("EventID", &numEvent);
+	tree10->SetBranchAddress("Ligne", &row);
+	tree10->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster10("tCluster10.root","recreate");
+   	TTree tCluster10("tCluster10","name10");
+
+	tCluster10.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree10->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree10->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster10.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster10.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster10.Write();
+
+	tCluster10.Draw("NumShape>>Clusterisation10(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster10 = (TH1D*)gPad->GetPrimitive("Clusterisation10");
+	histoCluster10->SetLineColor(kOrange+2);
+	//histoCluster10->SetFillStyle(3004);
+    histoCluster10->SetFillColor(kOrange+2);
+    histoCluster10->Scale(1./histoCluster10->Integral(), "width");
+
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 20deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f20= new TFile(filename20,"read");
+	TTree* tree20 = (TTree*) f20-> Get("FinalTree");
+
+	tree20->SetBranchAddress("EventID", &numEvent);
+	tree20->SetBranchAddress("Ligne", &row);
+	tree20->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster20("tCluster20.root","recreate");
+   	TTree tCluster20("tCluster20","name20");
+
+	tCluster20.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree20->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree20->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster20.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster20.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster20.Write();
+
+	tCluster20.Draw("NumShape>>Clusterisation20(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster20 = (TH1D*)gPad->GetPrimitive("Clusterisation20");
+	histoCluster20->SetLineColor(kRed);
+	//histoCluster20->SetFillStyle(3004);
+    histoCluster20->SetFillColor(kRed);
+    histoCluster20->Scale(1./histoCluster20->Integral(), "width");
+
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 30deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f30= new TFile(filename30,"read");
+	TTree* tree30 = (TTree*) f30-> Get("FinalTree");
+
+	tree30->SetBranchAddress("EventID", &numEvent);
+	tree30->SetBranchAddress("Ligne", &row);
+	tree30->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster30("tCluster30.root","recreate");
+   	TTree tCluster30("tCluster30","name30");
+
+	tCluster30.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree30->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree30->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster30.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster30.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster30.Write();
+
+	tCluster30.Draw("NumShape>>Clusterisation30(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster30 = (TH1D*)gPad->GetPrimitive("Clusterisation30");
+	histoCluster30->SetLineColor(kViolet);
+	//histoCluster30->SetFillStyle(3004);
+    histoCluster30->SetFillColor(kViolet);
+    histoCluster30->Scale(1./histoCluster30->Integral(), "width");
+
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 40deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f40= new TFile(filename40,"read");
+	TTree* tree40 = (TTree*) f40-> Get("FinalTree");
+
+	tree40->SetBranchAddress("EventID", &numEvent);
+	tree40->SetBranchAddress("Ligne", &row);
+	tree40->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster40("tCluster40.root","recreate");
+   	TTree tCluster40("tCluster40","name40");
+
+	tCluster40.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree40->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree40->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster40.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster40.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster40.Write();
+
+	tCluster40.Draw("NumShape>>Clusterisation40(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster40 = (TH1D*)gPad->GetPrimitive("Clusterisation40");
+	histoCluster40->SetLineColor(kMagenta+2);
+	//histoCluster40->SetFillStyle(3004);
+    histoCluster40->SetFillColor(kMagenta+2);
+    histoCluster40->Scale(1./histoCluster40->Integral(), "width");
+
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 50deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f50= new TFile(filename50,"read");
+	TTree* tree50 = (TTree*) f50-> Get("FinalTree");
+
+	tree50->SetBranchAddress("EventID", &numEvent);
+	tree50->SetBranchAddress("Ligne", &row);
+	tree50->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster50("tCluster50.root","recreate");
+   	TTree tCluster50("tCluster50","name50");
+
+	tCluster50.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree50->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree50->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster50.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster50.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster50.Write();
+
+	tCluster50.Draw("NumShape>>Clusterisation50(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster50 = (TH1D*)gPad->GetPrimitive("Clusterisation50");
+	histoCluster50->SetLineColor(kBlue);
+	//histoCluster50->SetFillStyle(3004);
+    histoCluster50->SetFillColor(kBlue);
+    histoCluster50->Scale(1./histoCluster50->Integral(), "width");
+
+////////////////////////////////////////////////////////////////////
+//                 Histo 60deg
+////////////////////////////////////////////////////////////////////
+
+
+	TFile* f60= new TFile(filename60,"read");
+	TTree* tree60 = (TTree*) f60-> Get("FinalTree");
+
+	tree60->SetBranchAddress("EventID", &numEvent);
+	tree60->SetBranchAddress("Ligne", &row);
+	tree60->SetBranchAddress("Colonne", &col);
+
+	//create a Tree file tree1.root
+   	//create the file, the Tree and a few branches
+   	TFile fCluster60("tCluster60.root","recreate");
+   	TTree tCluster60("tCluster60","name60");
+
+	tCluster60.Branch("NumShape",&NumShape,"NumShape/I");
+
+	for (int i = 0; i < n_pixels_tot; ++i)pixels_hit[i]=0;
+
+	//Initialisation
+	tree60->GetEntry(0);
+	NumHits = 0;
+
+	for(int i=0; i<n_entries; i++){
+		tree60->GetEntry(i);
+		if(eID==numEvent){
+
+			//Division euclidienne pour récupérer le numéro des pixels à partir des coordonnées:
+		  	//num_pix = npxl_row*C + (npxl_row - L) avec C le numéro de colonne et L de la ligne
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits+=1;
+			
+			// last entries
+			if(i==n_entries-1){
+				
+				ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+				for(int j=0;j<NumCluster;j++){
+					NumShape=ListClusterID[j];
+					tCluster60.Fill();
+				}
+			}
+
+		// all pixels in same events are stored		
+		} else {
+			ListClusterID = DifferentiateShape(pixels_hit, NumHits, &NumCluster);
+			for(int j=0;j<NumCluster;j++){
+				NumShape=ListClusterID[j];
+				tCluster60.Fill();
+			}
+			
+			// reset pixel_hits and add new elements
+			eID=numEvent;
+			for (int i = 0; i < n_pixels_tot; ++i) pixels_hit[i]=0;
+			num_pix = npxl_row * col + (npxl_row - row);
+			pixels_hit[num_pix] = 1;
+
+			NumHits=1;
+		}
+	}
+	tCluster60.Write();
+
+	tCluster60.Draw("NumShape>>Clusterisation60(29, 0, 29)", "Edep+Ecrosstalk+Enoise+Eleak>=Ethreshold","");
+	auto histoCluster60 = (TH1D*)gPad->GetPrimitive("Clusterisation60");
+	histoCluster60->SetLineColor(kGreen+2);
+	//histoCluster60->SetFillStyle(3004);
+    histoCluster60->SetFillColor(kGreen+2);
+    histoCluster60->Scale(1./histoCluster60->Integral(), "width");
+
+////////////////////////////////////////////////////////////////////
+//                 Histo stack
+////////////////////////////////////////////////////////////////////
+
+/*
+	c->cd(1);
+	c->SetWindowSize(5000,5000);
+    auto hs = new THStack("hs","");
+    TText T; T.SetTextFont(12); T.SetTextAlign(21);
+    hs->Add(histoCluster0);
+    hs->Add(histoCluster10);
+    hs->Add(histoCluster20);
+    hs->Add(histoCluster30);
+    hs->Add(histoCluster40);
+    hs->Add(histoCluster50);
+    hs->Add(histoCluster60);
+    hs->Draw("HIST,nostack");
+
+    hs->GetXaxis()->SetTitle("#font[12]{Cluster Shape ID}");
+    hs->GetYaxis()->SetTitle("#font[12]{Likelihood}");
+
+    T.DrawTextNDC(.5,.95,"Likelihood of different cluster shapes for different angle of incidence");
+
+    auto legend1 = new TLegend(0.9,0.7,0.7,0.9);
+   	legend1->SetHeader("Legend of the graph:","C"); // option "C" allows to center the header
+   	legend1->AddEntry(histoCluster0, "Angle : 0 deg", "f");
+   	legend1->AddEntry(histoCluster10, "Angle : 10 deg", "f");
+   	legend1->AddEntry(histoCluster20, "Angle : 20 deg", "f");
+   	legend1->AddEntry(histoCluster30, "Angle : 30 deg", "f");
+   	legend1->AddEntry(histoCluster40, "Angle : 40 deg", "f");
+   	legend1->AddEntry(histoCluster50, "Angle : 50 deg", "f");
+   	legend1->AddEntry(histoCluster60, "Angle : 60 deg", "f");
+	gStyle->SetStatFont(12);
+	gStyle->SetLegendFont(12);
+	gStyle->SetOptStat("e");
+
+	legend1->Draw();
+
+	//c->SaveAs("LikelihoodClusterShapes_nostack.pdf");
+
+	gPad->SetLogy(kTRUE);
+	c->SaveAs("LikelihoodClusterShapes_nostack_log.pdf");
+*/
+	TCanvas* c1 = new TCanvas;
+	c1->SetGrid();
+
+	c1->SetWindowSize(5000,5000);
+	auto hs1 = new THStack("hs1","");
+    TText T1; T1.SetTextFont(12); T1.SetTextAlign(21);
+    hs1->Add(histoCluster0);
+    hs1->Add(histoCluster10);
+    hs1->Add(histoCluster20);
+    hs1->Add(histoCluster30);
+    hs1->Add(histoCluster40);
+    hs1->Add(histoCluster50);
+    hs1->Add(histoCluster60);
+    hs1->Draw("HIST,nostackb");
+
+    hs1->GetXaxis()->SetNdivisions(29);
+    hs1->GetXaxis()->SetTitle("#font[12]{Cluster Shape ID}");
+    hs1->GetYaxis()->SetTitle("#font[12]{Likelihood}");
+
+    T1.DrawTextNDC(.5,.95,"Likelihood of different cluster shapes for different angle of incidence");
+
+    auto legend2 = new TLegend(0.9,0.7,0.7,0.9);
+   	legend2->SetHeader("Legend of the graph:","C"); // option "C" allows to center the header
+   	legend2->AddEntry(histoCluster0, "Angle : 0 deg", "f");
+   	legend2->AddEntry(histoCluster10, "Angle : 10 deg", "f");
+   	legend2->AddEntry(histoCluster20, "Angle : 20 deg", "f");
+   	legend2->AddEntry(histoCluster30, "Angle : 30 deg", "f");
+   	legend2->AddEntry(histoCluster40, "Angle : 40 deg", "f");
+   	legend2->AddEntry(histoCluster50, "Angle : 50 deg", "f");
+   	legend2->AddEntry(histoCluster60, "Angle : 60 deg", "f");
+	gStyle->SetStatFont(12);
+	gStyle->SetLegendFont(12);
+	gStyle->SetOptStat("e");
+
+	legend2->Draw();
+
+	//c1->SaveAs("LikelihoodClusterShapes_nostackb.pdf");
+
+	gPad->SetLogy(kTRUE);
+	c1->SaveAs("LikelihoodClusterShapes_nostackb_log.pdf");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void Clusterisation3(){
 
 /*
 	const char* filename0 = "~/bin/CmosProject/build/ED_0deg_1000Evt_1000part.root";
