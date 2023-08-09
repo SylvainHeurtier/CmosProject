@@ -30,8 +30,8 @@ const int npxl_col = 50; //more columns = more pixels along the x axis
 const double angle = 60;
 
 // Name of the ROOT file
-const G4String fileName = "ED_60deg_100Evt_10000part_radius30um.root";
-}
+const G4String fileName = "ED_60deg_100Evt_10000part_radius600um.root";
+} 
 
 #endif
 

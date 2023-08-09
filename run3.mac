@@ -41,7 +41,7 @@
 #_____________________
 #
 /gps/pos/centre 0 0 -120 mm
-/gps/pos/radius 30 um
+/gps/pos/radius 600 um
 #/gps/pos/sigma_r 0.1 um
 #_____________________
 #

@@ -22,8 +22,10 @@ void ParticleType(){
 ////////////////////////////////////////////////////////////////////
 
 	//*********************************************//
+	const char* filename = "~/bin/CmosProject/build/ED_0deg_100Evt_10000part_radius30um.root";
+	const char* treename="Chip0";
 
-	TFile* fetest= new TFile(ED_test,"read");  //width of chip = 50*um
+	TFile* fetest= new TFile(filename,"read");  //width of chip = 50*um
 	TTree* treetest= (TTree*) fetest-> Get(treename);
 
 	TCanvas* c1 = new TCanvas;
@@ -88,7 +90,7 @@ void ParticleType(){
 	histoTest3->Draw();
 */
     c1->cd(1);
-	treetest->Draw("NumParticle>>NumParticle(50, -6.5, 5.9)","","");
+	treetest->Draw("NumParticle>>NumParticle(50, -5.5, 4.9)","","");
 	auto histoTest4 = (TH1I*)gPad->GetPrimitive("NumParticle");
 	histoTest4->GetYaxis()->SetTitle("#font[12]{N count}");
 	histoTest4->SetTitle("#font[12]{Number code of the particule}");
@@ -111,13 +113,13 @@ void ParticleType(){
    	legend3->AddEntry((TObject*)0, " Muon+ : 3", "");
    	legend3->AddEntry((TObject*)0, " Kaon- : -4", "");
    	legend3->AddEntry((TObject*)0, " Kaon+ : 4", "");
-   	legend3->AddEntry((TObject*)0, " Pion- : -6", "");
-   	legend3->AddEntry((TObject*)0, " Pion+ : 6", "");
+   	legend3->AddEntry((TObject*)0, " Pion- : -5", "");
+   	legend3->AddEntry((TObject*)0, " Pion+ : 5", "");
    	legend3->AddEntry((TObject*)0, " Other particles : 0", "");
    	legend3->Draw();
 
     c1->cd(2);
-	treetest->Draw("NumParticle>>NumParticle2(50, -7, 7)","","");
+	treetest->Draw("NumParticle>>NumParticle2(50, -6, 6)","","");
 	auto histoTest6 = (TH1I*)gPad->GetPrimitive("NumParticle2");
 	histoTest6->GetYaxis()->SetTitle("#font[12]{N count}");
 	histoTest6->SetTitle("#font[12]{Number code of the particule}");
@@ -140,8 +142,8 @@ void ParticleType(){
    	legend4->AddEntry((TObject*)0, " Muon+ : 3", "");
    	legend4->AddEntry((TObject*)0, " Kaon- : -4", "");
    	legend4->AddEntry((TObject*)0, " Kaon+ : 4", "");
-   	legend4->AddEntry((TObject*)0, " Pion- : -6", "");
-   	legend4->AddEntry((TObject*)0, " Pion+ : 6", "");
+   	legend4->AddEntry((TObject*)0, " Pion- : -5", "");
+   	legend4->AddEntry((TObject*)0, " Pion+ : 5", "");
    	legend4->AddEntry((TObject*)0, " Other particles : 0", "");
    	legend4->Draw();
 

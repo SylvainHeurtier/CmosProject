@@ -118,7 +118,7 @@ void EnergyDeposit(){
 	histoE13->SetLineColor(kBlack);
 	histoE13->SetLineWidth(2);
 */
-	auto legend = new TLegend(0.9,0.6,0.5,0.9);
+	auto legend = new TLegend(0.9,0.5,0.5,0.9);
    	legend->SetHeader("#font[12]{Legend of the graph:}","C"); // option "C" allows to center the header
    	legend->AddEntry(histoE1,"#font[12]{Width of chips: d = 50 #mum}","L");
    	legend->AddEntry(histoE2,"#font[12]{Width of chips: d = 100 #mum}","L");
@@ -196,6 +196,7 @@ void EnergyDeposit(){
    	legend2->AddEntry(histoE8,"Angle #theta = 50 deg","L");
    	legend2->AddEntry(histoE9,"Angle #theta = 60 deg","L");
    	legend2->Draw();
+   	gStyle->SetLegendFont(12);
 
    	gStyle->SetOptStat(0);
    	c2->SaveAs("EnergyDeposit_Angle.pdf");
@@ -235,7 +236,7 @@ void EnergyDeposit(){
 	//******** Histo 1D : variable thickness ***********//
 	c3->SetGrid();
 
-	tree50->Draw("Edep>>EneregyDeposit50(1000,0.,0.3)");
+	tree50->Draw("Edep>>EneregyDeposit50(1000,0.,0.37)");
 	auto histoE50 = (TH1D*)gPad->GetPrimitive("EneregyDeposit50");
 	histoE50->GetYaxis()->SetTitle("#font[12]{N count}");
 	histoE50->SetTitle("#font[12]{Energy deposit on the chip};#font[12]{Energy deposit (MeV)}");
@@ -248,7 +249,7 @@ void EnergyDeposit(){
 	char Integral50[100];
     sprintf(Integral50, "%d",i50);
 
-	tree100->Draw("Edep>>EneregyDeposit100(300,0.,0.3)","","same");
+	tree100->Draw("Edep>>EneregyDeposit100(300,0.,0.37)","","same");
 	auto histoE100 = (TH1D*)gPad->GetPrimitive("EneregyDeposit100");
 	histoE100->SetLineColor(kBlue);
 	histoE100->SetLineWidth(2);
@@ -259,7 +260,7 @@ void EnergyDeposit(){
 	char Integral100[100];
     sprintf(Integral100, "%d",i100);
 
-	tree300->Draw("Edep>>EneregyDeposit300(300,0.,0.3)","","same");
+	tree300->Draw("Edep>>EneregyDeposit300(300,0.,0.37)","","same");
 	auto histoE300 = (TH1D*)gPad->GetPrimitive("EneregyDeposit300");
 	histoE300->SetLineColor(kGray);
 	histoE300->SetLineWidth(2);
@@ -270,7 +271,7 @@ void EnergyDeposit(){
 	char Integral300[100];
     sprintf(Integral300, "%d",i300);
 
-	tree500->Draw("Edep>>EneregyDeposit500(300,0.,0.3)","","same");
+	tree500->Draw("Edep>>EneregyDeposit500(300,0.,0.37)","","same");
 	auto histoE500 = (TH1D*)gPad->GetPrimitive("EneregyDeposit500");
 	histoE500->SetLineColor(kOrange);
 	histoE500->SetLineWidth(2);
@@ -281,7 +282,7 @@ void EnergyDeposit(){
 	char Integral500[100];
     sprintf(Integral500, "%d",i500);
 
-	tree600->Draw("Edep>>EneregyDeposit600(300,0.,0.3)","","same");
+	tree600->Draw("Edep>>EneregyDeposit600(300,0.,0.37)","","same");
 	auto histoE600 = (TH1D*)gPad->GetPrimitive("EneregyDeposit600");
 	histoE600->SetLineColor(kBlack);
 	histoE600->SetLineWidth(2);
@@ -292,7 +293,7 @@ void EnergyDeposit(){
 	char Integral600[100];
     sprintf(Integral600, "%d",i600);
 
-	tree700->Draw("Edep>>EneregyDeposit700(300,0.,0.3)","","same");
+	tree700->Draw("Edep>>EneregyDeposit700(300,0.,0.37)","","same");
 	auto histoE700 = (TH1D*)gPad->GetPrimitive("EneregyDeposit700");
 	histoE700->SetLineColor(kMagenta);
 	histoE700->SetLineWidth(2);
@@ -303,7 +304,7 @@ void EnergyDeposit(){
 	char Integral700[100];
     sprintf(Integral700, "%d",i700);
 
-	tree800->Draw("Edep>>EneregyDeposit800(300,0.,0.3)","","same");
+	tree800->Draw("Edep>>EneregyDeposit800(300,0.,0.37)","","same");
 	auto histoE800 = (TH1D*)gPad->GetPrimitive("EneregyDeposit800");
 	histoE800->SetLineColor(kGreen);
 	histoE800->SetLineWidth(2);
@@ -314,45 +315,45 @@ void EnergyDeposit(){
 	char Integral800[100];
     sprintf(Integral800, "%d",i800);
 
-	auto legend3 = new TLegend(0.9,0.5,0.6,0.9);
+	auto legend3 = new TLegend(0.9,0.5,0.5,0.9);
 	gStyle->SetLegendFont(12);
    	legend3->SetHeader("Legend of the graph:","C"); // option "C" allows to center the header
-   	legend3->SetNColumns(2);
+   	//legend3->SetNColumns(2);
 
    	legend3->AddEntry(histoE50,"Width of the chip: d = 50 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral50, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral50, "");
 
    	legend3->AddEntry(histoE100,"Width of the chip: d = 100 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral100, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral100, "");
 
    	legend3->AddEntry(histoE300,"Width of the chip: d = 300 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral300, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral300, "");
    	
    	legend3->AddEntry(histoE500,"Width of the chip: d = 500 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral500, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral500, "");
    	
    	legend3->AddEntry(histoE600,"Width of the chip: d = 600 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral600, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral600, "");
    	
    	legend3->AddEntry(histoE700,"Width of the chip: d = 700 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral700, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral700, "");
    	
    	legend3->AddEntry(histoE800,"Width of the chip: d = 800 #mum","L");
-   	legend3->AddEntry((TObject*)0, "", "");
-   	legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
-   	legend3->AddEntry((TObject*)0, Integral800, "");
+   	//legend3->AddEntry((TObject*)0, "", "");
+   	//legend3->AddEntry((TObject*)0, "                  Number of particles detected :", "");
+   	//legend3->AddEntry((TObject*)0, Integral800, "");
    	
    	legend3->Draw();
 

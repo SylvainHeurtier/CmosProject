@@ -14,8 +14,11 @@
 void EdepInPixel(){
 
 	//************************************************//
+	const char* filename = "~/bin/CmosProject/build/ED_0deg_1000Evt_10000part_radius600um.root";
+	const char* treename="Chip0";
 
-	TFile* f1= new TFile(ED_pixel3,"read");
+
+	TFile* f1= new TFile(filename,"read");
 	TTree* tree1 = (TTree*) f1-> Get(treename);
 
 ////////////////////////////////////////////////////////////////////
@@ -25,7 +28,7 @@ void EdepInPixel(){
 	TCanvas* c = new TCanvas;
 	c->SetGrid();
 	
-	//*********** Histo 2D : N vs Edep ****************//
+	//*********** Histo 3D ****************//
 
 	tree1->Draw("Edep:Colonne:Ligne>>GraphECL()", "","box");
 	auto histoLCE = (TH3D*)gPad->GetPrimitive("GraphECL");
@@ -47,16 +50,17 @@ void EdepInPixel(){
 	TCanvas* c1 = new TCanvas;
 	c1->SetGrid();
 
-	//*********** Histo 2D : N vs Edep ****************//
+	//*********** Histo 2D  ****************//
 
-	tree1->Draw("Colonne:Ligne>>GraphLC(100,0,200,100,0,200)", "","col");
+	tree1->Draw("Ligne:Colonne>>GraphLC(61,-5,55,111,-5,105)", "","col");
 	auto histoLC = (TH2D*)gPad->GetPrimitive("GraphLC");
 	histoLC->SetTitle("#font[12]{Pixel hit}");
-	histoLC->GetXaxis()->SetTitle("#font[12]{Row number }");
-	histoLC->GetYaxis()->SetTitle("#font[12]{Column number }");
+	histoLC->GetXaxis()->SetTitle("#font[12]{Column number }");
+	histoLC->GetYaxis()->SetTitle("#font[12]{Row number}");
 	histoLC->Draw("COLZ");
 	gStyle->SetStatFont(12);
-	gStyle->SetOptStat("nem");
+	gStyle->SetOptStat("e");
+	gStyle->SetPalette(kCool);
 
    	c1->SaveAs("PixelHit.pdf");
 
